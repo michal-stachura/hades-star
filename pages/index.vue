@@ -1,5 +1,5 @@
 <template>
   <div>
-    <h1 class="text-red-800">This is red text</h1>
+    <UiHeaderH1>This is header text</UiHeaderH1>
   </div>
 </template>
