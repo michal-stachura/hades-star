@@ -13,7 +13,7 @@
 a {
   @apply p-2 rounded-sm mr-2
 }
-.router-link-active {
+.router-link-active, .router-link-exact-active {
   @apply bg-gray-50/10;
 }
 </style>
