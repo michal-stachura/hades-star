@@ -1,8 +1,8 @@
 <script setup lang="ts">
   import corporationData from '@/data/corporationDetail.json';
-  import { CorporationDetails } from '@/types/corporation';
-
-  const corporation = ref<CorporationDetails | null>(corporationData)
+  const { corporation, wsReady, getWsReady } = useCorporationDetails();
+  corporation.value = corporationData;
+  getWsReady()
 </script>
 
 <template>
@@ -14,6 +14,9 @@
         {{ corporation.name }} details
       </UiHeaderH1>
       <UiDivider />
+      <div class="text-white">
+        WS ready: {{ wsReady }}
+      </div>
       <div class="flex">
         <div class="max-w-fit">
           <UiHeaderH2>
@@ -26,7 +29,7 @@
             {{ member.username }}
           </UiCard>
         </div>
-        <div class="ml-2 overflow-x-scroll">
+        <div class="ml-2">
           <UiHeaderH2>
             Next scan
           </UiHeaderH2>
