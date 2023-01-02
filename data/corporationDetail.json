@@ -6,11 +6,13 @@
   "members": [
     {
       "id": "uuid-1",
-      "username": "Stamina"
+      "username": "Stamina",
+      "nextWs": "R"
     },
     {
       "id": "uuid-2",
-      "username": "Other username"
+      "username": "Other username",
+      "nextWs": "R"
     },
     {
       "id": "uuid-3",
@@ -18,7 +20,8 @@
     },
     {
       "id": "uuid-4",
-      "username": "Not a boss"
+      "username": "Not a boss",
+      "nextWs": "X"
     }
   ]
 }

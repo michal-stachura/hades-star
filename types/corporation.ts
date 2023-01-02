@@ -3,7 +3,8 @@ import { Member } from '~/types/member';
 export interface Corporation {
   id: string;
   name: string;
-  members: number | Array<Member>;
+  membersCount?: number;
+  members?: Array<Member>;
 }
 
 export interface CorporationDetails extends Corporation {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import corporationsData from '~/data/corporations.json';
-import { Corporation } from '~/types/corporation';
+import corporationsData from '@/data/corporations.json';
+import { Corporation } from '@/types/corporation';
 
 const corporations = ref<Corporation[]>(corporationsData)
 

@@ -2,11 +2,11 @@
   {
     "id": "bloodtide",
     "name": "Bloodtide",
-    "members": 30
+    "membersCount": 30
   },
   {
     "id": "dummy-corp",
     "name": "Dummy Corporation",
-    "members": 20
+    "membersCount": 20
   }
 ]
