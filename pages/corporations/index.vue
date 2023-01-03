@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import corporationsData from '@/data/corporations.json';
+import corporationsData from '@/data/corporations';
 
 const { corporations } = useCorporations()
 corporations.value = corporationsData

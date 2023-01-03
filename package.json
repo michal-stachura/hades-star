@@ -14,10 +14,11 @@
     "sass-loader": "^13.2.0"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.2.1",
     "@fortawesome/fontawesome-pro": "^6.2.1",
-    "@fortawesome/pro-duotone-svg-icons": "^6.2.1",
+    "@fortawesome/fontawesome-svg-core": "^6.2.1",
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
-    "@fortawesome/vue-fontawesome": "^3.0.2"
+    "@fortawesome/pro-duotone-svg-icons": "^6.2.1",
+    "@fortawesome/vue-fontawesome": "^3.0.2",
+    "floating-vue": "^2.0.0-beta.20"
   }
 }

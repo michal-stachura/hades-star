@@ -5,7 +5,7 @@
   const { corporation, wsReady, getWsReady } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   corporation.value = corporationData;
-
+  getWsReady()
   const clickedMember = ref<Member | undefined>()
 
   function showMemberDetails(member: Member) {
@@ -35,6 +35,8 @@
             v-for="member in corporation.members"
             :key="member.id"
             @click="showMemberDetails(member)"
+            class="cursor-pointer"
+            v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
           >
             {{ member.username }}
           </UiCard>
