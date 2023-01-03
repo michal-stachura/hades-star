@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const { isPopupVisible } = usePopup();
+</script>
+
 <template>
   <div>
     <NavBar />
@@ -6,6 +10,7 @@
         <NuxtPage />
       </div>
     </div>
+    <div v-if="isPopupVisible" id="popup-container"></div>
   </div>
 </template>
 
@@ -18,5 +23,9 @@
   .page-leave-to {
     opacity: 0;
     filter: blur(1rem);
+  }
+
+  #popup-container {
+    @apply absolute top-0 left-0 w-full h-screen;
   }
 </style>

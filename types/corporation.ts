@@ -1,4 +1,4 @@
-import { Member } from '~/types/member';
+import { Member } from '@/types/member';
 
 export interface Corporation {
   id: string;

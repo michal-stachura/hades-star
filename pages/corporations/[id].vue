@@ -1,8 +1,17 @@
 <script setup lang="ts">
-  import corporationData from '@/data/corporationDetail.json';
+  import { Member } from '@/types/member';
+  import corporationData from '@/data/corporationDetailts';
+  
   const { corporation, wsReady, getWsReady } = useCorporationDetails();
+  const { isPopupVisible, popupToggleVisibility } = usePopup();
   corporation.value = corporationData;
-  getWsReady()
+
+  const clickedMember = ref<Member | undefined>()
+
+  function showMemberDetails(member: Member) {
+    clickedMember.value = member
+    popupToggleVisibility()
+  }
 </script>
 
 <template>
@@ -25,6 +34,7 @@
           <UiCard
             v-for="member in corporation.members"
             :key="member.id"
+            @click="showMemberDetails(member)"
           >
             {{ member.username }}
           </UiCard>
@@ -49,5 +59,34 @@
         @click="navigateTo('/corporations')"
       />
     </div>
+
+    <ClientOnly v-if="isPopupVisible">
+      <Teleport to="#popup-container">
+        <UiPopup>
+          <div class="p-4">
+            <UiHeaderH2>{{ clickedMember?.username }}</UiHeaderH2>
+            <UiDivider />
+            <div class="flex text-gray-200">
+              <div class="grow">
+                <UiParagraph>Timezone</UiParagraph>
+                <UiParagraph>Red Star Level</UiParagraph>
+                <UiParagraph>BattleShip Level</UiParagraph>
+                <UiParagraph>Max Mods</UiParagraph>
+                <UiParagraph>Willing to be Leader</UiParagraph>
+                <UiParagraph>Preferences</UiParagraph>
+              </div>
+              <div class="grow-0 text-right">
+                <UiParagraph>{{ clickedMember?.timeZone || '-' }}</UiParagraph>
+                <UiParagraph>{{ clickedMember?.rsLevel || '-' }}</UiParagraph>
+                <UiParagraph>{{ clickedMember?.bsLevel || '-' }}</UiParagraph>
+                <UiParagraph>{{ clickedMember?.maxMods || '-' }}</UiParagraph>
+                <UiParagraph>{{ clickedMember?.asLeader || '-' }}</UiParagraph>
+                <UiParagraph>{{ clickedMember?.preferences?.join(',') || '-' }}</UiParagraph>
+              </div>
+            </div>
+          </div>
+        </UiPopup>
+      </Teleport>
+    </ClientOnly>
   </div>
 </template>
