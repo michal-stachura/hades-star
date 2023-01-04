@@ -56,7 +56,7 @@
             <MembersAttributes
               :memberId="corporation.members![0].id"
               :attributeName="'Weapons'"
-              :namesOnly="true"
+              :iconsOnly="true"
             />
             <MembersAttributes
               v-for="member in corporation.members"

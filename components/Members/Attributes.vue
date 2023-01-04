@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  const { getMemberShipAttributes } = useShipAttributes()
+  const { getMemberShipAttributes } = useShipAttributes();
 
   const props = defineProps({
     memberId: {
@@ -10,35 +10,32 @@
       type: String,
       required: true,
     },
-    namesOnly: {
+    iconsOnly: {
       type: Boolean,
       required: false
     }
   })
-
   const membersAttributes = getMemberShipAttributes(props.memberId, props.attributeName)
-
 </script>
 
 <template>
-  <div class="flex relative">
+  <div class="flex">
     <div 
-      v-if="props.namesOnly"
-      class="absolute left-12 -top-16 bg-white/40 -rotate-90"
+      v-if="props.iconsOnly"
+      class="flex"
     >
       <div
         v-for="attribute in membersAttributes"
         :key="`attr-name${attribute.name}`"
-        class="text-gray-200"
+        :class="`bg-[url(/images/${$slugify(attribute.name)}.png)] w-16 h-16 bg-contain text-white`"
       >
-        <span class="block px-4 mb-6">{{ attribute.name }}</span>
+      aaa
       </div>
     </div>
     <div class="flex" v-else>
       <MembersAttributeCard
         v-for="attribute in membersAttributes"
         :key="attribute.name"
-        v-tooltip="attribute.name"
       >
         {{ attribute.value }}
       </MembersAttributeCard>
