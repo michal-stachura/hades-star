@@ -2,7 +2,7 @@
   import { Member } from '@/types/member';
   import corporationData from '@/data/corporationDetailts';
   
-  const { corporation, countMembers } = useCorporationDetails();
+  const { corporation } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   corporation.value = corporationData;
   const clickedMember = ref<Member | undefined>()
@@ -24,7 +24,7 @@
       <UiDivider />
       <CorporationsNextWsStats />>
       <div class="flex">
-        <div class="max-w-fit">
+        <div class="max-w-fit min-w-fit">
           <UiHeaderH2>
             Username
           </UiHeaderH2>
@@ -38,7 +38,7 @@
             {{ member.username }}
           </UiCard>
         </div>
-        <div class="ml-2">
+        <div class="ml-2 min-w-fit">
           <UiHeaderH2>
             Next scan
           </UiHeaderH2>
@@ -47,6 +47,35 @@
             :member="member"
             :key="member.id"
           />
+        </div>
+        <div class="flex overflow-x-scroll w-32">
+          <div class="ml-2 min-w-fit">
+            <UiHeaderH2>
+              Weapons
+            </UiHeaderH2>
+            <MembersAttributes
+              :memberId="corporation.members![0].id"
+              :attributeName="'Weapons'"
+              :namesOnly="true"
+            />
+            <MembersAttributes
+              v-for="member in corporation.members"
+              :key="`attr-${member.id}`"
+              :memberId="member.id"
+              :attributeName="'Weapons'"
+            />
+          </div>
+          <div class="ml-2 min-w-fit">
+            <UiHeaderH2>
+              Shields
+            </UiHeaderH2>
+            <MembersAttributes
+              v-for="member in corporation.members"
+              :key="`attr-${member.id}`"
+              :memberId="member.id"
+              :attributeName="'Shields'"
+            />
+          </div>
         </div>
       </div>
     </div>

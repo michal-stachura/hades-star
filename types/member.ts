@@ -1,3 +1,5 @@
+import { ShipAttribute } from "@/types/ship-attribute";
+
 export interface Member {
   id: string;
   username: string;
@@ -8,4 +10,5 @@ export interface Member {
   maxMods?: number;
   asLeader?: boolean;
   preferences?: string[];
+  shipAttributes?: [ShipAttribute]
 }

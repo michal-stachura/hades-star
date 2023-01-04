@@ -9,7 +9,6 @@ export default [
     "maxMods": 5,
     "alLeader": false,
     "preferences": ["A"]
-
   },
   {
     "id": "uuid-2",
