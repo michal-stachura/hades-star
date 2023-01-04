@@ -52,10 +52,10 @@
         @click="changeNextScan('X')"
       />
       <UiButton
-        v-if="nextScan"
+        v-if="nextScan !== '-'"
         :text="'-'" 
         class="mr-2"
-        @click="changeNextScan(undefined)"
+        @click="changeNextScan('-')"
       />
     </div>
   </div>

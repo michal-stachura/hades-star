@@ -2,10 +2,9 @@
   import { Member } from '@/types/member';
   import corporationData from '@/data/corporationDetailts';
   
-  const { corporation, wsReady, getWsReady } = useCorporationDetails();
+  const { corporation, countMembers } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   corporation.value = corporationData;
-  getWsReady()
   const clickedMember = ref<Member | undefined>()
 
   function showMemberDetails(member: Member) {
@@ -23,9 +22,7 @@
         {{ corporation.name }} details
       </UiHeaderH1>
       <UiDivider />
-      <div class="text-white">
-        WS ready: {{ wsReady }}
-      </div>
+      <CorporationsNextWsStats />>
       <div class="flex">
         <div class="max-w-fit">
           <UiHeaderH2>

@@ -18,7 +18,8 @@ export default [
   },
   {
     "id": "uuid-3",
-    "username": "Boss"
+    "username": "Boss",
+    "nextWs": "-"
   },
   {
     "id": "uuid-4",

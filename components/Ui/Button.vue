@@ -11,13 +11,41 @@
     text: {
       type: String,
       required: true
+    },
+    size: {
+      type: String,
+      required: false,
+      default: ''
     }
   })
+  
+  const setButtonSize = () => {
+    switch (props.size) {
+      case 'sm': {
+        return 'size-sm'
+      }
+      default: {
+        return 'size-default';
+      }
+    }
+  } 
 
 </script>
 
 <template>
-  <button class="bg-white px-4 py-2 rounded">
+  <button
+    :class="setButtonSize()"
+    class="bg-white rounded text-slate-800"
+  >
     {{ props.text }}
   </button>
 </template>
+
+<style scoped lang="scss">
+  .size-default {
+    @apply px-4 py-2;
+  }
+  .size-sm {
+    @apply px-2 py-1 text-sm;
+  }
+</style>
