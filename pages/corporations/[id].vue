@@ -25,7 +25,9 @@
       <CorporationsNextWsStats />>
       <div class="flex">
         <div class="max-w-fit min-w-fit">
-          <UiHeaderH2>
+          <UiHeaderH2
+            class="mb-14 pb-1"
+          >
             Username
           </UiHeaderH2>
           <UiCard
@@ -39,7 +41,9 @@
           </UiCard>
         </div>
         <div class="ml-2 min-w-fit">
-          <UiHeaderH2>
+          <UiHeaderH2
+            class="mb-14 pb-1"
+          >
             Next scan
           </UiHeaderH2>
           <CorporationsNextWs 
@@ -48,8 +52,8 @@
             :key="member.id"
           />
         </div>
-        <div class="flex overflow-x-scroll w-32">
-          <div class="ml-2 min-w-fit">
+        <div class="flex overflow-x-scroll w-36 ml-2">
+          <div class="min-w-fit">
             <UiHeaderH2>
               Weapons
             </UiHeaderH2>
@@ -69,6 +73,11 @@
             <UiHeaderH2>
               Shields
             </UiHeaderH2>
+            <MembersAttributes
+              :memberId="corporation.members![0].id"
+              :attributeName="'Shields'"
+              :iconsOnly="true"
+            />
             <MembersAttributes
               v-for="member in corporation.members"
               :key="`attr-${member.id}`"

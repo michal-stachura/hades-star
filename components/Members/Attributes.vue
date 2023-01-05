@@ -24,13 +24,15 @@
       v-if="props.iconsOnly"
       class="flex"
     >
-      <div
-        v-for="attribute in membersAttributes"
-        :key="`attr-name${attribute.name}`"
-        :class="`bg-[url(/images/${$slugify(attribute.name)}.png)] w-16 h-16 bg-contain text-white`"
-      >
-      aaa
-      </div>
+    <MembersAttributeCard
+      v-for="attribute in membersAttributes"
+      v-tooltip="attribute.name"
+    >
+      <nuxt-img
+        :src="`/images/${$slugify(attribute.name)}.png`"
+        loading="lazy"
+      />
+    </MembersAttributeCard>
     </div>
     <div class="flex" v-else>
       <MembersAttributeCard
