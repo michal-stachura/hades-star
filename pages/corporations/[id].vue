@@ -22,7 +22,15 @@
         {{ corporation.name }} details
       </UiHeaderH1>
       <UiDivider />
-      <CorporationsNextWsStats />>
+      <CorporationsNextWsStats />
+      <UiCard>
+        Todo:
+        <ul>
+          <li>Add colors depends on module level?</li>
+          <li>Add "max" indicator for modules 12/12</li>
+          <li>Opacity = 0.8 if module level === 0</li>
+        </ul>
+      </UiCard>
       <div class="flex">
         <div class="max-w-fit min-w-fit">
           <UiHeaderH2
@@ -83,6 +91,54 @@
               :key="`attr-${member.id}`"
               :memberId="member.id"
               :attributeName="'Shields'"
+            />
+          </div>
+          <div class="ml-2 min-w-fit">
+            <UiHeaderH2>
+              Support modules
+            </UiHeaderH2>
+            <MembersAttributes
+              :memberId="corporation.members![0].id"
+              :attributeName="'Support'"
+              :iconsOnly="true"
+            />
+            <MembersAttributes
+              v-for="member in corporation.members"
+              :key="`attr-${member.id}`"
+              :memberId="member.id"
+              :attributeName="'Support'"
+            />
+          </div>
+          <div class="ml-2 min-w-fit">
+            <UiHeaderH2>
+              Mining modules
+            </UiHeaderH2>
+            <MembersAttributes
+              :memberId="corporation.members![0].id"
+              :attributeName="'Mining'"
+              :iconsOnly="true"
+            />
+            <MembersAttributes
+              v-for="member in corporation.members"
+              :key="`attr-${member.id}`"
+              :memberId="member.id"
+              :attributeName="'Mining'"
+            />
+          </div>
+          <div class="ml-2 min-w-fit">
+            <UiHeaderH2>
+              Trade modules
+            </UiHeaderH2>
+            <MembersAttributes
+              :memberId="corporation.members![0].id"
+              :attributeName="'Trade'"
+              :iconsOnly="true"
+            />
+            <MembersAttributes
+              v-for="member in corporation.members"
+              :key="`attr-${member.id}`"
+              :memberId="member.id"
+              :attributeName="'Trade'"
             />
           </div>
         </div>
