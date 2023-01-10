@@ -1,7 +1,11 @@
 import { CorporationDetails } from '@/types/corporation';
 
 const useCorporationDetails = () => {
-  const corporation = useState<CorporationDetails | undefined>('corporation', undefined)
+  const corporation = useState<CorporationDetails>('corporation')
+
+  const setCorporationDetails = (data: CorporationDetails) => {
+    corporation.value = data
+  }
 
   const countMembers = (statuses: string[]) => {
     if (statuses.length > 0) {
@@ -26,6 +30,7 @@ const useCorporationDetails = () => {
 
   return {
     corporation,
+    setCorporationDetails,
     setWsStatus,
     clearWsStatus,
     countMembers

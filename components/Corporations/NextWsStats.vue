@@ -1,5 +1,6 @@
 <script setup lang="ts">
   const { countMembers } = useCorporationDetails();
+  
 </script>
 
 <template>

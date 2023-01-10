@@ -1,37 +1,50 @@
 <script setup lang="ts">
+  import { CorporationDetails } from '@/types/corporation';
   import { Member } from '@/types/member';
-  import corporationData from '@/data/corporationDetailts';
-  
+  const route = useRoute();
+  const config = useRuntimeConfig();
   const { corporation } = useCorporationDetails();
+  const { data, error, pending } = await useLazyAsyncData('corporation', () => $fetch(`${config.apiBaseUrl}/corporations/${route.params.id}/`))
   const { isPopupVisible, popupToggleVisibility } = usePopup();
-  corporation.value = corporationData;
   const clickedMember = ref<Member | undefined>()
-
+  
+  
+  function setDetails(details: CorporationDetails) {
+    corporation.value = details;
+  }
+  
   function showMemberDetails(member: Member) {
     clickedMember.value = member
     popupToggleVisibility()
   }
+
+  watch (data, (newData) => {
+    setDetails(newData as CorporationDetails)
+  })
 </script>
 
 <template>
   <div>
-    <div v-if="corporation">
+    <div v-if="pending || error">
+      <UiCard>
+        {{ pending ? "Fetching data..." : error }}
+      </UiCard>
+      <UiButton 
+        :text="'Go back'"
+        @click="navigateTo('/corporations')"
+      />
+    </div>
+    <div v-if="!error && !pending && corporation">
       <UiHeaderH1
         :nav-back="'/corporations'"
       >
         {{ corporation.name }} details
       </UiHeaderH1>
       <UiDivider />
-      <CorporationsNextWsStats />
-      <UiCard>
-        Todo:
-        <ul>
-          <li>Add colors depends on module level?</li>
-          <li>Add "max" indicator for modules 12/12</li>
-          <li>Opacity = 0.8 if module level === 0</li>
-        </ul>
-      </UiCard>
-      <div class="flex">
+      <CorporationsNextWsStats 
+        :members="corporation.members"
+      />
+      <div class="flex mt-2">
         <div class="max-w-fit min-w-fit">
           <UiHeaderH2
             class="mb-14 pb-1"
@@ -143,14 +156,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div v-else``>
-      <UiHeaderH1>404</UiHeaderH1>
-      <UiParagraph>Sorry Corporation not found</UiParagraph>
-      <UiButton
-        :text="'Go back'"
-        @click="navigateTo('/corporations')"
-      />
     </div>
 
     <ClientOnly v-if="isPopupVisible">
