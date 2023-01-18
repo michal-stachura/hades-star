@@ -1,10 +1,10 @@
 <script setup lang="ts">
   import { PropType } from 'vue';
-  import { ShipAttribute } from '@/types/ship-attribute';
+  import { Attribute } from '@/types/ship-attribute';
 
   const props = defineProps({
     attribute: {
-      type: Object as PropType<ShipAttribute>,
+      type: Object as PropType<Attribute>,
       required: true
     },
     iconsOnly: {
@@ -14,7 +14,7 @@
     }
   })
 
-  const tooltipText = (attribute: ShipAttribute): String | null => {
+  const tooltipText = (attribute: Attribute): String | null => {
     switch(true) {
       case props.iconsOnly: {
         return attribute.name

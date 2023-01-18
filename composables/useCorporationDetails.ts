@@ -20,11 +20,11 @@ const useCorporationDetails = () => {
       corporation.value.members[memberIdx].nextWs = status
     }
   }
-  
-  const clearWsStatus = (userId: string) => {
+
+  const getWsStatus = (userId: string) => {
     if (corporation.value?.members) {
       const memberIdx = corporation.value.members.findIndex(obj => obj.id === userId)
-      corporation.value.members[memberIdx].nextWs = '-'
+      return corporation.value.members[memberIdx].nextWs
     }
   }
 
@@ -32,7 +32,7 @@ const useCorporationDetails = () => {
     corporation,
     setCorporationDetails,
     setWsStatus,
-    clearWsStatus,
+    getWsStatus,
     countMembers
   }
 }
