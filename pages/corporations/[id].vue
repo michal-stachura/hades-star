@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { CorporationDetails } from '@/types/corporation';
   import { Member } from '@/types/member';
+  import { Attribute } from '@/types/ship-attribute';
 
   const route = useRoute();
   const config = useRuntimeConfig();
@@ -8,6 +9,7 @@
   const { data, error, pending, refresh } = await useLazyAsyncData('corporation', () => $fetch(`${config.apiBaseUrl}/corporations/${route.params.id}/`))
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   const clickedMember = ref<Member | undefined>()
+  const clickedAttribute = ref<Attribute | undefined>()
   
   
   function setDetails(details: CorporationDetails) {
@@ -19,8 +21,19 @@
     popupToggleVisibility()
   }
 
+  function showAttributeDetails(attribute: Attribute) {
+    clickedAttribute.value = attribute
+    popupToggleVisibility()
+  }
+
   watch (data, (newData) => {
     setDetails(newData as CorporationDetails)
+  })
+  watch (isPopupVisible, (popupVisibility) => {
+    if (popupVisibility === false) {
+      clickedMember.value = undefined
+      clickedAttribute.value = undefined
+    }
   })
   if (corporation.value === undefined && !pending.value)  {
     refresh();
@@ -103,6 +116,7 @@
                     v-for="attribute in member.attributes.weapon"
                     :key="attribute.name"
                     :attribute="attribute"
+                    @click="showAttributeDetails(attribute)"
                   />
                 </div>
               </div>
@@ -131,6 +145,7 @@
                     v-for="attribute in member.attributes.shield"
                     :key="attribute.name"
                     :attribute="attribute"
+                    @click="showAttributeDetails(attribute)"
                   />
                 </div>
               </div>
@@ -159,6 +174,7 @@
                     v-for="attribute in member.attributes.support"
                     :key="attribute.name"
                     :attribute="attribute"
+                    @click="showAttributeDetails(attribute)"
                   />
                 </div>
               </div>
@@ -187,6 +203,7 @@
                     v-for="attribute in member.attributes.mining"
                     :key="attribute.name"
                     :attribute="attribute"
+                    @click="showAttributeDetails(attribute)"
                   />
                 </div>
               </div>
@@ -215,6 +232,7 @@
                     v-for="attribute in member.attributes.trade"
                     :key="attribute.name"
                     :attribute="attribute"
+                    @click="showAttributeDetails(attribute)"
                   />
                 </div>
               </div>
@@ -224,7 +242,7 @@
       </div>
     </div>
 
-    <ClientOnly v-if="isPopupVisible">
+    <ClientOnly v-if="isPopupVisible && clickedMember">
       <Teleport to="#popup-container">
         <UiPopup>
           <div class="p-4">
@@ -252,5 +270,27 @@
         </UiPopup>
       </Teleport>
     </ClientOnly>
+
+    <ClientOnly v-if="isPopupVisible && clickedAttribute">
+      <Teleport to="#popup-container">
+        <UiPopup>
+          <div class="p-4">
+            <UiHeaderH2>{{ clickedAttribute.name }}</UiHeaderH2>
+            <UiDivider />
+            <div class="flex text-gray-200">
+              <div class="grow">
+                <UiParagraph>Value</UiParagraph>
+                <UiParagraph>Max</UiParagraph>
+              </div>
+              <div class="grow-0 text-right">
+                <UiParagraph>{{ clickedAttribute.value }}</UiParagraph>
+                <UiParagraph>{{ clickedAttribute.max }}</UiParagraph>
+              </div>
+            </div>
+          </div>
+        </UiPopup>
+      </Teleport>
+    </ClientOnly>
+    
   </div>
 </template>
