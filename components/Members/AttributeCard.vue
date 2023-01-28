@@ -1,7 +1,8 @@
 <script setup lang="ts">
   import { PropType } from 'vue';
   import { Attribute } from '@/types/ship-attribute';
-
+  
+  const { $reslugify } = useNuxtApp();
   const props = defineProps({
     attribute: {
       type: Object as PropType<Attribute>,
@@ -17,7 +18,7 @@
   const tooltipText = (attribute: Attribute): String | null => {
     switch(true) {
       case props.iconsOnly: {
-        return attribute.name
+        return $reslugify(attribute.name)
       }
       default: {
         return null

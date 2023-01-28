@@ -275,7 +275,7 @@
       <Teleport to="#popup-container">
         <UiPopup>
           <div class="p-4">
-            <UiHeaderH2>{{ clickedAttribute.name }}</UiHeaderH2>
+            <UiHeaderH2>{{ $reslugify(clickedAttribute.name) }}</UiHeaderH2>
             <UiDivider />
             <div class="flex text-gray-200">
               <div class="grow">
