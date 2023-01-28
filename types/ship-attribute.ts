@@ -1,4 +1,5 @@
 export interface Attribute {
+  id: string,
   name: string,
   value: number,
   max: number

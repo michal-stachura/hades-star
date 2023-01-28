@@ -2,6 +2,7 @@
   import { CorporationDetails } from '@/types/corporation';
   import { Member } from '@/types/member';
   import { Attribute } from '@/types/ship-attribute';
+  import { useToast } from "vue-toastification";
 
   const route = useRoute();
   const config = useRuntimeConfig();
@@ -9,8 +10,10 @@
   const { data, error, pending, refresh } = await useLazyAsyncData('corporation', () => $fetch(`${config.apiBaseUrl}/corporations/${route.params.id}/`))
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   const clickedMember = ref<Member | undefined>()
+  const clickedMemberId = ref<String>()
   const clickedAttribute = ref<Attribute | undefined>()
-  
+  const sendRequest = ref(false);
+  const toast = useToast();
   
   function setDetails(details: CorporationDetails) {
     corporation.value = details;
@@ -21,9 +24,46 @@
     popupToggleVisibility()
   }
 
-  function showAttributeDetails(attribute: Attribute) {
+  function showAttributeDetails(attribute: Attribute, memberId: String) {
+    clickedMemberId.value = memberId
     clickedAttribute.value = attribute
     popupToggleVisibility()
+  }
+
+  async function setAttributeLevel(attribute: Attribute, level:Number) {
+    if (sendRequest.value) {
+      return
+    }
+    sendRequest.value = true;
+    
+    const { data, error, pending } = await useFetch<Attribute>(
+      `${config.apiBaseUrl}/members/${clickedMemberId.value}/attribute/`,
+      {
+        method: 'PATCH',
+        body: {
+          attributeId: attribute.id,
+          value: level,
+          attributeName: attribute.name
+        }
+      }
+    );
+    
+    if (data.value) {
+      attribute.value = data.value.currentValue
+      clickedMemberId.value = undefined
+      clickedAttribute.value = undefined
+      popupToggleVisibility()
+    }
+    if (error.value) {
+      if (error.value.response) {
+        toast.error(`${error.value.response.status} - ${error.value.response.statusText}`)
+      }
+    }
+    sendRequest.value = pending.value
+  }
+
+  const attributeButtonLayout = (currentValue: Number, attributeValue: Number) => {
+    return currentValue === attributeValue ? '' : 'transparent'
   }
 
   watch (data, (newData) => {
@@ -116,7 +156,7 @@
                     v-for="attribute in member.attributes.weapon"
                     :key="attribute.name"
                     :attribute="attribute"
-                    @click="showAttributeDetails(attribute)"
+                    @click="showAttributeDetails(attribute, member.id)"
                   />
                 </div>
               </div>
@@ -145,7 +185,7 @@
                     v-for="attribute in member.attributes.shield"
                     :key="attribute.name"
                     :attribute="attribute"
-                    @click="showAttributeDetails(attribute)"
+                    @click="showAttributeDetails(attribute, member.id)"
                   />
                 </div>
               </div>
@@ -174,7 +214,7 @@
                     v-for="attribute in member.attributes.support"
                     :key="attribute.name"
                     :attribute="attribute"
-                    @click="showAttributeDetails(attribute)"
+                    @click="showAttributeDetails(attribute, member.id)"
                   />
                 </div>
               </div>
@@ -203,7 +243,7 @@
                     v-for="attribute in member.attributes.mining"
                     :key="attribute.name"
                     :attribute="attribute"
-                    @click="showAttributeDetails(attribute)"
+                    @click="showAttributeDetails(attribute, member.id)"
                   />
                 </div>
               </div>
@@ -232,7 +272,7 @@
                     v-for="attribute in member.attributes.trade"
                     :key="attribute.name"
                     :attribute="attribute"
-                    @click="showAttributeDetails(attribute)"
+                    @click="showAttributeDetails(attribute, member.id)"
                   />
                 </div>
               </div>
@@ -277,15 +317,19 @@
           <div class="p-4">
             <UiHeaderH2>{{ $reslugify(clickedAttribute.name) }}</UiHeaderH2>
             <UiDivider />
-            <div class="flex text-gray-200">
-              <div class="grow">
-                <UiParagraph>Value</UiParagraph>
-                <UiParagraph>Max</UiParagraph>
-              </div>
-              <div class="grow-0 text-right">
-                <UiParagraph>{{ clickedAttribute.value }}</UiParagraph>
-                <UiParagraph>{{ clickedAttribute.max }}</UiParagraph>
-              </div>
+            <div class="text-center">
+              <UiParagraph>
+                Choose your current {{ $reslugify(clickedAttribute.name) }} level.
+              </UiParagraph>
+              <UiDivider />
+              <UiButton 
+                v-for="idx in clickedAttribute.max"
+                class="m-1"
+                :key="idx"
+                :text="`${idx}`"
+                :layout="attributeButtonLayout(idx, clickedAttribute.value)"
+                @click="setAttributeLevel(clickedAttribute!,  idx)"
+              />
             </div>
           </div>
         </UiPopup>

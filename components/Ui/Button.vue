@@ -16,26 +16,44 @@
       type: String,
       required: false,
       default: ''
+    },
+    layout: {
+      type: String,
+      required: false,
+      default: ''
     }
   })
   
   const setButtonSize = () => {
     switch (props.size) {
       case 'sm': {
-        return 'size-sm'
+        return 'size-sm';
       }
       default: {
         return 'size-default';
       }
     }
-  } 
+  }
 
+  const setButtonLayout = () => {
+    switch (props.layout) {
+      case 'transparent': {
+        return 'bg-white/30 rounded text-white';
+      }
+      default: {
+        return 'bg-white rounded text-slate-800';
+      }
+    }
+  }
+
+  const buttonLayout = () => {
+    return `${setButtonSize()} ${setButtonLayout()}`
+  }
 </script>
 
 <template>
   <button
-    :class="setButtonSize()"
-    class="bg-white rounded text-slate-800"
+    :class="buttonLayout()"
   >
     {{ props.text }}
   </button>

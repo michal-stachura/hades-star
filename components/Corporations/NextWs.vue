@@ -6,7 +6,6 @@
   const showNextScanButtons = ref(false);
   const sendRequest = ref(false);
   const toast = useToast();
-  const route = useRoute();
   const config = useRuntimeConfig();
 
   const props = defineProps({
