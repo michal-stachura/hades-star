@@ -38,7 +38,7 @@
   const setButtonLayout = () => {
     switch (props.layout) {
       case 'transparent': {
-        return 'bg-white/30 rounded text-white';
+        return 'bg-white/30 rounded text-white hover:bg-white/40';
       }
       default: {
         return 'bg-white rounded text-slate-800';
@@ -53,6 +53,7 @@
 
 <template>
   <button
+    class="transition-all duration-300 hover:scale-110"
     :class="buttonLayout()"
   >
     {{ props.text }}

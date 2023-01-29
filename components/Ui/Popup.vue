@@ -8,7 +8,7 @@
       <slot />
       <font-awesome-icon
         icon="fa-duotone fa-circle-xmark"
-        class="text-gray-200 text-3xl absolute -top-4 -right-4"
+        class="text-gray-200 text-3xl absolute -top-4 -right-4 cursor-pointer transition-all duration-300"
         @click="popupToggleVisibility"
       />
     </div>

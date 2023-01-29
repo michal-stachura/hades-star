@@ -1,7 +1,7 @@
 import { CorporationDetails } from '@/types/corporation';
 
 const useCorporationDetails = () => {
-  const corporation = useState<CorporationDetails>('corporation')
+  const corporation = useState<CorporationDetails | null>('corporation')
 
   const setCorporationDetails = (data: CorporationDetails) => {
     corporation.value = data
@@ -28,12 +28,29 @@ const useCorporationDetails = () => {
     }
   }
 
+  const getCorporationSecret = (corporationId: string):string => {
+    let corporationSecret = '';
+    if (process.client) {
+      corporationSecret = localStorage.getItem(corporationId) || '';
+      if (corporationSecret !== '') {
+        corporationSecret = JSON.parse(corporationSecret).secret || '';
+      }
+    }
+    return corporationSecret;
+  }
+
+  const setCorporationSecret = (secret: String, corporationId: String) => {
+    localStorage.setItem(corporationId.toString(), JSON.stringify({secret: secret}))
+  }
+
   return {
     corporation,
     setCorporationDetails,
     setWsStatus,
     getWsStatus,
-    countMembers
+    countMembers,
+    getCorporationSecret,
+    setCorporationSecret
   }
 }
 

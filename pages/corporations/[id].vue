@@ -1,317 +1,351 @@
 <script setup lang="ts">
   import { CorporationDetails } from '@/types/corporation';
+  import { useToast } from "vue-toastification";
   import { Member } from '@/types/member';
   import { Attribute } from '@/types/ship-attribute';
-  import { useToast } from "vue-toastification";
 
   const route = useRoute();
   const config = useRuntimeConfig();
-  const { corporation } = useCorporationDetails();
-  const { data, error, pending, refresh } = await useLazyAsyncData('corporation', () => $fetch(`${config.apiBaseUrl}/corporations/${route.params.id}/`))
-  const { isPopupVisible, popupToggleVisibility } = usePopup();
-  const clickedMember = ref<Member | undefined>()
-  const clickedMemberId = ref<String>()
-  const clickedAttribute = ref<Attribute | undefined>()
+  const isLoading = ref(true);
   const sendRequest = ref(false);
+  const incorrectSecret = ref(false);
+  const editMember = ref(false);
+  const clickedMember = ref<Member | null>();
+  const clickedAttribute = ref<Attribute | null>();
   const toast = useToast();
-  
-  function setDetails(details: CorporationDetails) {
-    corporation.value = details;
-  }
-  
-  function showMemberDetails(member: Member) {
-    clickedMember.value = member
-    popupToggleVisibility()
-  }
+  const { corporation, getCorporationSecret } = useCorporationDetails();
+  const { isPopupVisible, popupToggleVisibility } = usePopup();
+  const corporationId: string = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
-  function showAttributeDetails(attribute: Attribute, memberId: String) {
-    clickedMemberId.value = memberId
-    clickedAttribute.value = attribute
-    popupToggleVisibility()
+  async function fetchCorporationData() {
+    corporation.value = null;
+    
+    await fetch(
+      `${config.apiBaseUrl}/corporations/${route.params.id}/`,
+      {
+        headers: [['Corporation-Secret', getCorporationSecret(corporationId)]],
+      }
+    ).then((response) => {
+      if (response.ok) {
+        return response.json()
+      }
+      return Promise.reject(response);
+    }).then((responseJson) => {
+      corporation.value = responseJson as CorporationDetails
+      isLoading.value = false;
+      incorrectSecret.value = false;
+    }).catch((error) => {
+      toast.error(`${error.status} - ${error.statusText}`)
+      isLoading.value = false;
+      incorrectSecret.value = true;
+    })
   }
 
   async function setAttributeLevel(attribute: Attribute, level:Number) {
-    if (sendRequest.value) {
-      return
-    }
-    sendRequest.value = true;
-    
-    const { data, error, pending } = await useFetch<Attribute>(
-      `${config.apiBaseUrl}/members/${clickedMemberId.value}/attribute/`,
-      {
-        method: 'PATCH',
-        body: {
-          attributeId: attribute.id,
-          value: level,
-          attributeName: attribute.name
+      if (sendRequest.value) {
+        return
+      }
+      sendRequest.value = true;
+
+      const { data, error, pending } = await useFetch<Attribute>(
+        `${config.apiBaseUrl}/members/${clickedMember.value!.id}/attribute/`,
+        {
+          method: 'PATCH',
+          body: {
+            attributeId: attribute.id,
+            value: level,
+            attributeName: attribute.name,
+            corporationId: route.params.id,
+          },
+          headers: [
+            ['Corporation-Secret', getCorporationSecret(corporationId)]
+          ],   
+        }
+      );
+      
+      if (data.value) {
+        attribute.value = data.value.value
+        clickedMember.value = undefined
+        clickedAttribute.value = undefined
+        popupToggleVisibility()
+      }
+      if (error.value) {
+        if (error.value.response) {
+          toast.error(`${error.value.response.status} - ${error.value.response.statusText}`)
         }
       }
-    );
-    
-    if (data.value) {
-      attribute.value = data.value.currentValue
-      clickedMemberId.value = undefined
-      clickedAttribute.value = undefined
-      popupToggleVisibility()
+      sendRequest.value = pending.value
     }
-    if (error.value) {
-      if (error.value.response) {
-        toast.error(`${error.value.response.status} - ${error.value.response.statusText}`)
-      }
-    }
-    sendRequest.value = pending.value
+
+  function showMemberDetails(member: Member) {
+    clickedAttribute.value = null;
+    clickedMember.value = member;
+    popupToggleVisibility();
+  }
+
+  function showAttributeDetails(attribute: Attribute, member: Member) {
+    clickedMember.value = member;
+    clickedAttribute.value = attribute;
+    popupToggleVisibility()
   }
 
   const attributeButtonLayout = (currentValue: Number, attributeValue: Number) => {
     return currentValue === attributeValue ? '' : 'transparent'
   }
 
-  watch (data, (newData) => {
-    setDetails(newData as CorporationDetails)
-  })
-  watch (isPopupVisible, (popupVisibility) => {
-    if (popupVisibility === false) {
-      clickedMember.value = undefined
-      clickedAttribute.value = undefined
-    }
-  })
-  if (corporation.value === undefined && !pending.value)  {
-    refresh();
-  }
+  fetchCorporationData();
+
+
 </script>
 
 <template>
   <div>
-    <div v-if="pending || error">
+    <div v-if="isLoading">
       <UiCard>
-        {{ pending ? "Fetching data..." : error }}
+        Fetching data...
       </UiCard>
-      <UiButton 
-        :text="'Go back'"
-        @click="navigateTo('/corporations')"
-      />
     </div>
-    <div v-if="!error && !pending && corporation">
-      <UiHeaderH1
-        :nav-back="'/corporations'"
-      >
-        {{ corporation.name }} details
-      </UiHeaderH1>
-      <UiDivider />
-      <CorporationsNextWsStats 
-        :members="corporation.members"
-      />
-      <div class="flex mt-2">
-        <div class="max-w-fit min-w-fit">
-          <UiHeaderH2
-            class="mb-14 pb-1"
+    <div v-else>
+      <div v-if="incorrectSecret">
+        <CorporationsSecret
+          :corporationId="route.params.id.toString()"
+          @corporationSecretChange="fetchCorporationData()"
+        />
+      </div>
+      <div v-else>
+        <div v-if="corporation">
+          <UiHeaderH1
+            :nav-back="'/corporations'"
           >
-            Username
-          </UiHeaderH2>
-          <UiCard
-            v-for="member in corporation.members"
-            :key="member.id"
-            @click="showMemberDetails(member)"
-            class="cursor-pointer"
-            v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
-          >
-            {{ member.name }}
-          </UiCard>
-        </div>
-        <div class="ml-2 min-w-fit">
-          <UiHeaderH2
-            class="mb-14 pb-1"
-          >
-            Next scan
-          </UiHeaderH2>
-          <CorporationsNextWs 
-            v-for="member in corporation.members"
-            :member="member"
-            :key="`nextWS_${member.id}`"
+            {{ corporation.name }} details
+          </UiHeaderH1>
+          <UiDivider />
+          <CorporationsNextWsStats 
+            :members="corporation.members"
           />
-        </div>
-        <div class="flex overflow-x-scroll w-36 ml-2">
-          <div class="min-w-fit flex">
-            <div>
-              <UiHeaderH2>
-                Weapons
+          <div class="flex mt-2">
+            <div class="max-w-fit min-w-fit">
+              <UiHeaderH2
+                class="mb-14 pb-1"
+              >
+                Username
               </UiHeaderH2>
-              <div>
-                <div class="flex">
-                  <MembersAttributeCard
-                    v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                    v-for="attribute in corporation.members[0].attributes.weapon"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    :iconsOnly="true"
-                  />
-                </div>
-                <div
-                  v-for="member in corporation.members"
-                  :key="member.id"
-                  class="flex w-full"
-                >
-                  <MembersAttributeCard
-                    v-if="member.attributes"
-                    v-for="attribute in member.attributes.weapon"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    @click="showAttributeDetails(attribute, member.id)"
-                  />
-                </div>
-              </div>
+              <UiCard
+                v-for="member in corporation.members"
+                :key="member.id"
+                @click="showMemberDetails(member)"
+                class="cursor-pointer"
+                v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
+              >
+                {{ member.name }}
+              </UiCard>
             </div>
-            <div class="ml-2">
-              <UiHeaderH2>
-                Shields
+            <div class="ml-2 min-w-fit">
+              <UiHeaderH2
+                class="mb-14 pb-1"
+              >
+                Next scan
               </UiHeaderH2>
-              <div>
-                <div class="flex">
-                  <MembersAttributeCard
-                    v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                    v-for="attribute in corporation.members[0].attributes.shield"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    :iconsOnly="true"
-                  />
-                </div>
-                <div
-                  v-for="member in corporation.members"
-                  :key="member.id"
-                  class="flex w-full"
-                >
-                  <MembersAttributeCard
-                    v-if="member.attributes"
-                    v-for="attribute in member.attributes.shield"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    @click="showAttributeDetails(attribute, member.id)"
-                  />
-                </div>
-              </div>
+              <CorporationsNextWs
+                v-for="member in corporation.members"
+                :member="member"
+                :corporationId="corporationId"
+                :key="`nextWS_${member.id}`"
+              />
             </div>
-            <div class="ml-2">
-              <UiHeaderH2>
-                Support
-              </UiHeaderH2>
-              <div>
-                <div class="flex">
-                  <MembersAttributeCard
-                    v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                    v-for="attribute in corporation.members[0].attributes.support"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    :iconsOnly="true"
-                  />
+            <div class="flex overflow-x-scroll w-36 ml-2">
+              <div class="min-w-fit flex">
+                <div>
+                  <UiHeaderH2>
+                    Weapons
+                  </UiHeaderH2>
+                  <div>
+                    <div class="flex">
+                      <MembersAttributeCard
+                        v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
+                        v-for="attribute in corporation.members[0].attributes.weapon"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        :iconsOnly="true"
+                      />
+                    </div>
+                    <div
+                      v-for="member in corporation.members"
+                      :key="member.id"
+                      class="flex w-full"
+                    >
+                      <MembersAttributeCard
+                        v-if="member.attributes"
+                        v-for="attribute in member.attributes.weapon"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        class="cursor-pointer"
+                        @click="showAttributeDetails(attribute, member)"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div
-                  v-for="member in corporation.members"
-                  :key="member.id"
-                  class="flex w-full"
-                >
-                  <MembersAttributeCard
-                    v-if="member.attributes"
-                    v-for="attribute in member.attributes.support"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    @click="showAttributeDetails(attribute, member.id)"
-                  />
+                <div class="ml-2">
+                  <UiHeaderH2>
+                    Shields
+                  </UiHeaderH2>
+                  <div>
+                    <div class="flex">
+                      <MembersAttributeCard
+                        v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
+                        v-for="attribute in corporation.members[0].attributes.shield"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        :iconsOnly="true"
+                      />
+                    </div>
+                    <div
+                      v-for="member in corporation.members"
+                      :key="member.id"
+                      class="flex w-full"
+                    >
+                      <MembersAttributeCard
+                        v-if="member.attributes"
+                        v-for="attribute in member.attributes.shield"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        @click="showAttributeDetails(attribute, member)"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="ml-2">
-              <UiHeaderH2>
-                Mining
-              </UiHeaderH2>
-              <div>
-                <div class="flex">
-                  <MembersAttributeCard
-                    v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                    v-for="attribute in corporation.members[0].attributes.mining"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    :iconsOnly="true"
-                  />
+                <div class="ml-2">
+                  <UiHeaderH2>
+                    Support
+                  </UiHeaderH2>
+                  <div>
+                    <div class="flex">
+                      <MembersAttributeCard
+                        v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
+                        v-for="attribute in corporation.members[0].attributes.support"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        :iconsOnly="true"
+                      />
+                    </div>
+                    <div
+                      v-for="member in corporation.members"
+                      :key="member.id"
+                      class="flex w-full"
+                    >
+                      <MembersAttributeCard
+                        v-if="member.attributes"
+                        v-for="attribute in member.attributes.support"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        @click="showAttributeDetails(attribute, member)"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div
-                  v-for="member in corporation.members"
-                  :key="member.id"
-                  class="flex w-full"
-                >
-                  <MembersAttributeCard
-                    v-if="member.attributes"
-                    v-for="attribute in member.attributes.mining"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    @click="showAttributeDetails(attribute, member.id)"
-                  />
+                <div class="ml-2">
+                  <UiHeaderH2>
+                    Mining
+                  </UiHeaderH2>
+                  <div>
+                    <div class="flex">
+                      <MembersAttributeCard
+                        v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
+                        v-for="attribute in corporation.members[0].attributes.mining"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        :iconsOnly="true"
+                      />
+                    </div>
+                    <div
+                      v-for="member in corporation.members"
+                      :key="member.id"
+                      class="flex w-full"
+                    >
+                      <MembersAttributeCard
+                        v-if="member.attributes"
+                        v-for="attribute in member.attributes.mining"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        @click="showAttributeDetails(attribute, member)"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="ml-2">
-              <UiHeaderH2>
-                Trade
-              </UiHeaderH2>
-              <div>
-                <div class="flex">
-                  <MembersAttributeCard
-                    v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                    v-for="attribute in corporation.members[0].attributes.trade"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    :iconsOnly="true"
-                  />
-                </div>
-                <div
-                  v-for="member in corporation.members"
-                  :key="member.id"
-                  class="flex w-full"
-                >
-                  <MembersAttributeCard
-                    v-if="member.attributes"
-                    v-for="attribute in member.attributes.trade"
-                    :key="attribute.name"
-                    :attribute="attribute"
-                    @click="showAttributeDetails(attribute, member.id)"
-                  />
+                <div class="ml-2">
+                  <UiHeaderH2>
+                    Trade
+                  </UiHeaderH2>
+                  <div>
+                    <div class="flex">
+                      <MembersAttributeCard
+                        v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
+                        v-for="attribute in corporation.members[0].attributes.trade"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        :iconsOnly="true"
+                      />
+                    </div>
+                    <div
+                      v-for="member in corporation.members"
+                      :key="member.id"
+                      class="flex w-full"
+                    >
+                      <MembersAttributeCard
+                        v-if="member.attributes"
+                        v-for="attribute in member.attributes.trade"
+                        :key="attribute.name"
+                        :attribute="attribute"
+                        @click="showAttributeDetails(attribute, member)"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <div v-else>
+          <UiCard>
+            Error fetching data. Please try again.
+          </UiCard>
+          <UiButton 
+            :text="'Refresh'"
+            class="ml-2"
+            @click="fetchCorporationData()"
+          />
+          <UiButton 
+            :text="'Go back'"
+            class="ml-2"
+            @click="navigateTo('/corporations')"
+          />
+        </div>
       </div>
     </div>
 
-    <ClientOnly v-if="isPopupVisible && clickedMember">
+    <ClientOnly v-if="isPopupVisible && clickedMember && !clickedAttribute">
       <Teleport to="#popup-container">
         <UiPopup>
-          <div class="p-4">
-            <UiHeaderH2>{{ clickedMember?.name }}</UiHeaderH2>
-            <UiDivider />
-            <div class="flex text-gray-200">
-              <div class="grow">
-                <UiParagraph>Timezone</UiParagraph>
-                <UiParagraph>Red Star Level</UiParagraph>
-                <UiParagraph>BattleShip Level</UiParagraph>
-                <UiParagraph>Max Mods</UiParagraph>
-                <UiParagraph>Willing to be Leader</UiParagraph>
-                <UiParagraph>Preferences</UiParagraph>
-              </div>
-              <div class="grow-0 text-right">
-                <UiParagraph>{{ clickedMember?.timeZone || '-' }}</UiParagraph>
-                <UiParagraph>{{ clickedMember?.rsLevel || '-' }}</UiParagraph>
-                <UiParagraph>{{ clickedMember?.bsLevel || '-' }}</UiParagraph>
-                <UiParagraph>{{ clickedMember?.maxMods || '-' }}</UiParagraph>
-                <UiParagraph>{{ clickedMember?.asLeader || '-' }}</UiParagraph>
-                <UiParagraph>{{ clickedMember?.preferences?.join(',') || '-' }}</UiParagraph>
-              </div>
-            </div>
+          <div v-if="!editMember" class="p-4">
+            <MembersDetails
+              :member="clickedMember"
+              @editMember="editMember = true"
+            />
+          </div>
+          <div
+            v-if="editMember"
+            class="p-4"
+          >
+            <MembersEdit
+              :member="clickedMember"
+              @cancelEditMember="editMember = false"
+            />
           </div>
         </UiPopup>
       </Teleport>
     </ClientOnly>
 
-    <ClientOnly v-if="isPopupVisible && clickedAttribute">
+    <ClientOnly v-if="isPopupVisible && clickedMember && clickedAttribute">
       <Teleport to="#popup-container">
         <UiPopup>
           <div class="p-4">
@@ -335,6 +369,5 @@
         </UiPopup>
       </Teleport>
     </ClientOnly>
-    
   </div>
 </template>

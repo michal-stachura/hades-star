@@ -7,16 +7,20 @@
   const sendRequest = ref(false);
   const toast = useToast();
   const config = useRuntimeConfig();
+  const { getCorporationSecret } = useCorporationDetails();
 
   const props = defineProps({
     member: {
-    required: true,
-    type: Object as PropType<Member>
+      required: true,
+      type: Object as PropType<Member>
+    },
+    corporationId: {
+      required: true,
+      type: String
     }
   });
-  const { setWsStatus, getWsStatus } =  useCorporationDetails()
+  const { setWsStatus, getWsStatus } =  useCorporationDetails();
   const nextScan = ref<string | undefined>(props.member.nextWs);
-
 
   async function changeNextScan(status: string | undefined) {
     if (sendRequest.value) {
@@ -30,8 +34,12 @@
       {
         method: 'PATCH',
         body: {
-          nextWs: status
-        }
+          nextWs: status,
+          corporationId: props.corporationId,
+        },
+        headers: [
+          ['Corporation-Secret', getCorporationSecret(props.corporationId)]
+        ],        
       }
     )
     if (data.value) {
