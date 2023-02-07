@@ -77,9 +77,17 @@
       sendRequest.value = pending.value
     }
 
-  function showMemberDetails(member: Member) {
+  function showMemberDetails(member: Member): void {
+    editMember.value = false;
     clickedAttribute.value = null;
     clickedMember.value = member;
+    popupToggleVisibility();
+  }
+
+  function hideMemberDetails(): void {
+    editMember.value = false;
+    clickedAttribute.value = null;
+    clickedMember.value = null;
     popupToggleVisibility();
   }
 
@@ -109,7 +117,7 @@
       <div v-if="incorrectSecret">
         <CorporationsSecret
           :corporationId="route.params.id.toString()"
-          @corporationSecretChange="fetchCorporationData()"
+          @corporation-secret-change="fetchCorporationData()"
         />
       </div>
       <div v-else>
@@ -338,7 +346,9 @@
           >
             <MembersEdit
               :member="clickedMember"
-              @cancelEditMember="editMember = false"
+              :corporationId="corporationId"
+              @cancel-edit-member="editMember = false"
+              @success-edit-member="hideMemberDetails()"
             />
           </div>
         </UiPopup>

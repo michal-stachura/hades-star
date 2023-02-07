@@ -1,4 +1,5 @@
 import { CorporationDetails } from '@/types/corporation';
+import { Member } from '@/types/member';
 
 const useCorporationDetails = () => {
   const corporation = useState<CorporationDetails | null>('corporation')
@@ -43,6 +44,14 @@ const useCorporationDetails = () => {
     localStorage.setItem(corporationId.toString(), JSON.stringify({secret: secret}))
   }
 
+  const updateCorporationMember = (member: Member) => {
+    if (corporation.value && corporation.value.members) {
+      const memberIdx = corporation.value.members.findIndex(obj => obj.id === member.id)
+
+      corporation.value.members[memberIdx] = member
+    }
+  }
+
   return {
     corporation,
     setCorporationDetails,
@@ -50,7 +59,8 @@ const useCorporationDetails = () => {
     getWsStatus,
     countMembers,
     getCorporationSecret,
-    setCorporationSecret
+    setCorporationSecret,
+    updateCorporationMember
   }
 }
 

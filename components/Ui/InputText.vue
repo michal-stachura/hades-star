@@ -1,12 +1,12 @@
 <script setup lang='ts'>
-  
+
   const props = defineProps({
     name: {
       type: String,
       required: true
     },
     value: {
-      type: String,
+      type: [String, Number],
       required: false,
       default: ''
     },
@@ -28,24 +28,24 @@
     cssClasses: {
       type: String,
       required: false,
-      default: ""
+      default: ''
     },
     helpText: {
       type: String,
       required: false,
-      default: ""
+      default: ''
     },
     label: {
       type: String,
       required: false,
-      default: ""
+      default: ''
     }
   })
 </script>
 
 
 <template>
-  <div class="mb-4 relative">
+  <div class="mb-2 relative">
     <UiLabel
       v-if="label"
       :text="label"
@@ -57,7 +57,7 @@
       :type="type"
       :disabled="disabled"
       :class="cssClasses"
-      @input="$emit('update:modelValue', $event.target?.value)"
+      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       class="h-10 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-200 rounded text-gray-800 transition-all duration-500 px-2"
     />
     <SharedFormHelpText v-if="helpText" 

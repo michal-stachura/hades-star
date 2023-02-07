@@ -4,11 +4,11 @@ export interface Member {
   id: string;
   name: string;
   nextWs: string;
-  timeZone?: string;
-  rsLevel?: number;
-  bsLevel?: number;
-  maxMods?: number;
-  asLeader?: boolean;
-  preferences?: string[];
-  attributes?: ShipAttribute
+  timeZone: string;
+  rsLevel: number;
+  bsLevel: number;
+  maxMods: number;
+  asLeader: boolean;
+  wsShipRoles: string[];
+  attributes: ShipAttribute
 }

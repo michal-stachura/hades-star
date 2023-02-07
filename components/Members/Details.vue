@@ -32,7 +32,7 @@
         <UiParagraph>{{ member.bsLevel || '-' }}</UiParagraph>
         <UiParagraph>{{ member.maxMods || '-' }}</UiParagraph>
         <UiParagraph>{{ member.asLeader || '-' }}</UiParagraph>
-        <UiParagraph>{{ member.preferences?.join(',') || '-' }}</UiParagraph>
+        <UiParagraph>{{ member.wsShipRoles?.join(',') || '-' }}</UiParagraph>
       </div>
     </div>
     <UiDivider />
