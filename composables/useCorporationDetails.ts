@@ -52,6 +52,16 @@ const useCorporationDetails = () => {
     }
   }
 
+  const deleteCorporationMember = (memberId: string) => {
+    if (corporation.value && corporation.value.members) {
+      const memberIdx = corporation.value.members.findIndex(obj => obj.id === memberId)
+      console.log(memberIdx)
+      if (memberIdx > -1) {
+        corporation.value.members.splice(memberIdx, 1);
+      }
+    }
+  }
+
   return {
     corporation,
     setCorporationDetails,
@@ -60,7 +70,8 @@ const useCorporationDetails = () => {
     countMembers,
     getCorporationSecret,
     setCorporationSecret,
-    updateCorporationMember
+    updateCorporationMember,
+    deleteCorporationMember
   }
 }
 

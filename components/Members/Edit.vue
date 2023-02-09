@@ -1,9 +1,9 @@
 <script setup lang="ts">
   import { Member } from '@/types/member';
-  import commonTimezones from '@/data/commonTimezones';
   import { PropType } from 'vue';
   import { useToast } from 'vue-toastification';
-import { emitKeypressEvents } from 'readline';
+  import commonTimezones from '@/data/commonTimezones';
+  import wsShipRoles from '@/data/wsShipRoles';
 
   const props = defineProps({
     member: {
@@ -15,7 +15,7 @@ import { emitKeypressEvents } from 'readline';
       required: true,
     }
   })
-  const emit = defineEmits(['cancelEditMember', 'successEditMember'])
+  const emit = defineEmits(['cancelEditMember', 'successEditMember']);
   
   const memberForm = reactive({
     name: props.member.name,
@@ -27,14 +27,7 @@ import { emitKeypressEvents } from 'readline';
     wsShipRoles: props.member.wsShipRoles,
     corporationId: props.corporationId
   })
-  const wsShipRoles = [
-    { code: 'A', name: 'All roles are good for me' },
-    { code: 'H', name: 'Hunter' },
-    { code: 'U', name: 'Utility' },
-    { code: 'D', name: 'Defensive' },
-    { code: 'V', name: 'Vanguard' },
-    { code: 'P', name: 'Phalanx' },
-  ]
+
   const { getCorporationSecret, updateCorporationMember } = useCorporationDetails();
   const sendRequest = ref(false);
   const config = useRuntimeConfig();
@@ -77,12 +70,6 @@ import { emitKeypressEvents } from 'readline';
     if (memberForm.wsShipRoles.length === 5) {
       memberForm.wsShipRoles = ['A']
     }
-  }
-
-  function wsShipRoleName(shipRole: string): string {
-    return wsShipRoles.filter((el) => {
-      return el.code === shipRole
-    })[0].name
   }
 
   function formVerify() {
@@ -246,9 +233,8 @@ import { emitKeypressEvents } from 'readline';
             class="h-24 mx-auto"
           />
           <div class="text-center mt-4">
-            <UiBadge
-              v-for="memberShipRole in memberForm.wsShipRoles"
-              :text="wsShipRoleName(memberShipRole)"
+            <MembersWsShipRoles 
+              :shipRoles="memberForm.wsShipRoles"
             />
           </div>
         </div>

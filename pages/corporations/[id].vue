@@ -337,7 +337,9 @@
           <div v-if="!editMember" class="p-4">
             <MembersDetails
               :member="clickedMember"
-              @editMember="editMember = true"
+              :corporationId="corporationId"
+              @edit-member="editMember = true"
+              @success-delete-member="hideMemberDetails()"
             />
           </div>
           <div
