@@ -13,7 +13,7 @@ import { useToast } from 'vue-toastification';
     name: '',
     corporation: [props.corporationId],
   });
-  const { getCorporationSecret } = useCorporationDetails();
+  const { getCorporationSecret, addCorporationMember } = useCorporationDetails();
 
   const config = useRuntimeConfig();
   const toast = useToast();
@@ -46,8 +46,9 @@ import { useToast } from 'vue-toastification';
       )
 
       if (data.value) {
-        toast.success('Member added successfully.')
-        emit('sucessAddMember')
+        toast.success('Member added successfully.');
+        emit('sucessAddMember');
+        addCorporationMember({...data.value});
       }
       if (error.value) {
         toast.error(`${error.value.response.status} - ${error.value.data.detail}`)

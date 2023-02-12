@@ -94,7 +94,7 @@
     const { data, error, pending } = await useFetch(
       `${config.apiBaseUrl}/members/${props.member.id}/`,
         {
-          method: "PATCH",
+          method: 'PATCH',
           body: memberForm,
           headers: [
             ['Corporation-Secret', getCorporationSecret(props.corporationId)]

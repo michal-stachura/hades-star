@@ -1,5 +1,7 @@
 <script setup lang="ts">
-  const { isPopupVisible, popupToggleVisibility } = usePopup();
+  // const { isPopupVisible, popupToggleVisibility } = usePopup();
+
+  const emit = defineEmits(['close-popup'])
 </script>
 
 <template>
@@ -9,7 +11,7 @@
       <font-awesome-icon
         icon="fa-duotone fa-circle-xmark"
         class="text-gray-200 text-3xl absolute -top-4 -right-4 cursor-pointer transition-all duration-300"
-        @click="popupToggleVisibility"
+        @click="emit('close-popup')"
       />
     </div>
   </div>

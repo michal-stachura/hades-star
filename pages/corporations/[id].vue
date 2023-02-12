@@ -13,6 +13,9 @@
   const clickedMember = ref<Member | null>();
   const clickedAttribute = ref<Attribute | null>();
   const addMemberPopup = ref(false);
+  const changeSecretPopup = ref(false);
+  const memberDetailsPopup = ref(false);
+  const memberAttributePopup = ref(false);
   const toast = useToast();
   const { corporation, getCorporationSecret } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
@@ -78,26 +81,27 @@
       sendRequest.value = pending.value
     }
 
-  function showMemberDetails(member: Member): void {
-    editMember.value = false;
-    clickedAttribute.value = null;
-    clickedMember.value = member;
-    addMemberPopup.value = false;
-    popupToggleVisibility();
-  }
-
-  function hideMemberDetails(): void {
+  function hideAllPopups(): void {
     editMember.value = false;
     clickedAttribute.value = null;
     clickedMember.value = null;
     addMemberPopup.value = false;
+    changeSecretPopup.value = false;
+    memberDetailsPopup.value = false;
+    memberAttributePopup.value = false;
+    popupToggleVisibility();
+  }
+
+  function showMemberDetails(member: Member): void {
+    clickedMember.value = member;
+    memberDetailsPopup.value = true;
     popupToggleVisibility();
   }
 
   function showAttributeDetails(attribute: Attribute, member: Member) {
     clickedMember.value = member;
     clickedAttribute.value = attribute;
-    addMemberPopup.value = false;
+    memberAttributePopup.value = true;
     popupToggleVisibility()
   }
 
@@ -325,13 +329,14 @@
               :layout="'transparent'"
               :size="'sm'"
               class="mr-2"
-              @click="showAddMemberPopup()"
-            />
-            <UiButton 
+              @click="addMemberPopup = true; popupToggleVisibility()"
+              />
+              <UiButton 
               :text="'Change secret'"
               :layout="'transparent'"
               :size="'sm'"
               class="mr-2"
+              @click="changeSecretPopup = true; popupToggleVisibility()"
             />
           </div>
         </div>
@@ -355,25 +360,39 @@
 
     <ClientOnly v-if="isPopupVisible && addMemberPopup">
       <Teleport to="#popup-container">
-        <UiPopup>
+        <UiPopup
+          @close-popup="hideAllPopups()"
+        >
           <MembersAdd 
             :corporationId="corporationId"
-            @cancel-add-member="addMemberPopup = false; popupToggleVisibility();"
+            @cancel-add-member="hideAllPopups();"
+            @sucess-add-member="hideAllPopups();"
           />
         </UiPopup>
       </Teleport>
     </ClientOnly>
 
-
-    <ClientOnly v-if="isPopupVisible && clickedMember && !clickedAttribute">
+    <ClientOnly v-if="isPopupVisible && changeSecretPopup">
       <Teleport to="#popup-container">
-        <UiPopup>
+        <UiPopup
+          @close-popup="hideAllPopups()"
+        >
+          Change Secret Popup
+        </UiPopup>
+      </Teleport>
+    </ClientOnly>
+
+    <ClientOnly v-if="isPopupVisible && memberDetailsPopup">
+      <Teleport to="#popup-container">
+        <UiPopup
+          @close-popup="hideAllPopups()"
+        >
           <div v-if="!editMember" class="p-4">
             <MembersDetails
               :member="clickedMember"
               :corporationId="corporationId"
               @edit-member="editMember = true"
-              @success-delete-member="hideMemberDetails()"
+              @success-delete-member="hideAllPopups();"
             />
           </div>
           <div
@@ -383,17 +402,19 @@
             <MembersEdit
               :member="clickedMember"
               :corporationId="corporationId"
-              @cancel-edit-member="editMember = false"
-              @success-edit-member="hideMemberDetails()"
+              @cancel-edit-member="hideAllPopups();"
+              @success-edit-member="hideAllPopups();"
             />
           </div>
         </UiPopup>
       </Teleport>
     </ClientOnly>
 
-    <ClientOnly v-if="isPopupVisible && clickedMember && clickedAttribute">
+    <ClientOnly v-if="isPopupVisible && memberAttributePopup">
       <Teleport to="#popup-container">
-        <UiPopup>
+        <UiPopup
+          @close-popup="hideAllPopups()"
+        >
           <div class="p-4">
             <UiHeaderH2>{{ $reslugify(clickedAttribute.name) }}</UiHeaderH2>
             <UiDivider />
