@@ -12,6 +12,7 @@
   const editMember = ref(false);
   const clickedMember = ref<Member | null>();
   const clickedAttribute = ref<Attribute | null>();
+  const addMemberPopup = ref(false);
   const toast = useToast();
   const { corporation, getCorporationSecret } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
@@ -81,6 +82,7 @@
     editMember.value = false;
     clickedAttribute.value = null;
     clickedMember.value = member;
+    addMemberPopup.value = false;
     popupToggleVisibility();
   }
 
@@ -88,12 +90,14 @@
     editMember.value = false;
     clickedAttribute.value = null;
     clickedMember.value = null;
+    addMemberPopup.value = false;
     popupToggleVisibility();
   }
 
   function showAttributeDetails(attribute: Attribute, member: Member) {
     clickedMember.value = member;
     clickedAttribute.value = attribute;
+    addMemberPopup.value = false;
     popupToggleVisibility()
   }
 
@@ -101,9 +105,12 @@
     return currentValue === attributeValue ? '' : 'transparent'
   }
 
+  function showAddMemberPopup() {
+    addMemberPopup.value = true;
+    popupToggleVisibility();
+  }
+
   fetchCorporationData();
-
-
 </script>
 
 <template>
@@ -312,6 +319,21 @@
               </div>
             </div>
           </div>
+          <div class="bg-black/60 fixed bottom-0 left-0 w-full p-4">
+            <UiButton 
+              :text="'Add member'"
+              :layout="'transparent'"
+              :size="'sm'"
+              class="mr-2"
+              @click="showAddMemberPopup()"
+            />
+            <UiButton 
+              :text="'Change secret'"
+              :layout="'transparent'"
+              :size="'sm'"
+              class="mr-2"
+            />
+          </div>
         </div>
         <div v-else>
           <UiCard>
@@ -330,6 +352,18 @@
         </div>
       </div>
     </div>
+
+    <ClientOnly v-if="isPopupVisible && addMemberPopup">
+      <Teleport to="#popup-container">
+        <UiPopup>
+          <MembersAdd 
+            :corporationId="corporationId"
+            @cancel-add-member="addMemberPopup = false; popupToggleVisibility();"
+          />
+        </UiPopup>
+      </Teleport>
+    </ClientOnly>
+
 
     <ClientOnly v-if="isPopupVisible && clickedMember && !clickedAttribute">
       <Teleport to="#popup-container">
