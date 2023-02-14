@@ -24,7 +24,7 @@
     bsLevel: props.member.bsLevel,
     maxMods: props.member.maxMods,
     asLeader: props.member.asLeader,
-    wsShipRoles: props.member.wsShipRoles,
+    wsShipRoles: props.member.wsShipRoles || [],
     corporationId: props.corporationId
   })
 

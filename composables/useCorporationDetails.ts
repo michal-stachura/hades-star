@@ -91,7 +91,7 @@ const useCorporationDetails = () => {
     setCorporationSecret,
     updateCorporationMember,
     addCorporationMember,
-    deleteCorporationMember
+    deleteCorporationMember,
   }
 }
 

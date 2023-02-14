@@ -63,7 +63,7 @@ import { useToast } from 'vue-toastification';
 </script>
 
 <template>
-  <div class="p-4">
+  <div class="p-4 w-full md:w-96">
     <UiHeaderH2>
       Add new member
     </UiHeaderH2>
@@ -74,7 +74,6 @@ import { useToast } from 'vue-toastification';
       :name="'memberName'"
       class="mb-5"
     />
-    <UiDivider />
     <UiButton
       :layout="'transparent'"
       :size="'sm'"

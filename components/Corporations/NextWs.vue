@@ -39,7 +39,7 @@
         },
         headers: [
           ['Corporation-Secret', getCorporationSecret(props.corporationId)]
-        ],        
+        ],
       }
     )
     if (data.value) {
@@ -91,7 +91,7 @@
         @click="changeNextScan('X')"
       />
       <UiButton
-        v-if="nextScan !== '-'"
+        v-if="nextScan !== '-' && nextScan !== ''"
         :text="'-'" 
         class="mr-2"
         @click="changeNextScan('-')"

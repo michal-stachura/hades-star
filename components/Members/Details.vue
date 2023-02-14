@@ -54,7 +54,7 @@
 
 
 <template>
-  <div>
+  <div class="w-full w-96">
     <UiHeaderH2>{{ member.name }}</UiHeaderH2>
     <UiDivider />
     <div class="flex text-gray-200">

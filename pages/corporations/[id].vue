@@ -16,6 +16,8 @@
   const changeSecretPopup = ref(false);
   const memberDetailsPopup = ref(false);
   const memberAttributePopup = ref(false);
+  const editCorporationPopup = ref(false);
+  const detailsVisible = ref(false);
   const toast = useToast();
   const { corporation, getCorporationSecret } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
@@ -63,7 +65,7 @@
           },
           headers: [
             ['Corporation-Secret', getCorporationSecret(corporationId)]
-          ],   
+          ],
         }
       );
       
@@ -83,12 +85,11 @@
 
   function hideAllPopups(): void {
     editMember.value = false;
-    clickedAttribute.value = null;
-    clickedMember.value = null;
     addMemberPopup.value = false;
     changeSecretPopup.value = false;
     memberDetailsPopup.value = false;
     memberAttributePopup.value = false;
+    editCorporationPopup.value = false;
     popupToggleVisibility();
   }
 
@@ -109,11 +110,6 @@
     return currentValue === attributeValue ? '' : 'transparent'
   }
 
-  function showAddMemberPopup() {
-    addMemberPopup.value = true;
-    popupToggleVisibility();
-  }
-
   fetchCorporationData();
 </script>
 
@@ -127,22 +123,41 @@
     <div v-else>
       <div v-if="incorrectSecret">
         <CorporationsSecret
+          :goBackBtn="true"
           :corporationId="route.params.id.toString()"
           @corporation-secret-change="fetchCorporationData()"
         />
       </div>
       <div v-else>
         <div v-if="corporation">
-          <UiHeaderH1
-            :nav-back="'/corporations'"
-          >
-            {{ corporation.name }} details
-          </UiHeaderH1>
+          <div class="flex">
+            <div class="grow">
+              <UiHeaderH1
+                :nav-back="'/corporations'"
+              >
+                {{ corporation.name }}
+              </UiHeaderH1>
+            </div>
+            <div class="grow-0">
+              <font-awesome-icon
+                class="cursor-pointer float-right ml-1 text-3xl text-gray-200"
+                icon="fa-duotone fa-circle-info"
+                @click="detailsVisible = !detailsVisible"
+              />
+            </div>
+          </div>
           <UiDivider />
+          <CorporationsDetails 
+            :corporation="corporation"
+            class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
+            :class="{'max-h-[24rem]': detailsVisible}"
+          />
           <CorporationsNextWsStats 
             :members="corporation.members"
           />
-          <div class="flex mt-2">
+          <div
+            v-if="corporation.members && corporation.members.length > 0"
+            class="flex mt-2">
             <div class="max-w-fit min-w-fit">
               <UiHeaderH2
                 class="mb-14 pb-1"
@@ -172,7 +187,7 @@
                 :key="`nextWS_${member.id}`"
               />
             </div>
-            <div class="flex overflow-x-scroll w-36 ml-2">
+            <div class="flex overflow-x-scroll w-full ml-2">
               <div class="min-w-fit flex">
                 <div>
                   <UiHeaderH2>
@@ -323,22 +338,41 @@
               </div>
             </div>
           </div>
-          <div class="bg-black/60 fixed bottom-0 left-0 w-full p-4">
+          <div
+            v-else
+            class="text-center mt-4">
+            <UiCard>
+              <UiHeaderH1>Ups!</UiHeaderH1>
+              <UiParagraph>No members yet. Please add first member</UiParagraph>
+              <UiButton 
+                :text="'Add Member'"
+                @click="addMemberPopup = true; popupToggleVisibility()"
+              />
+            </UiCard>
+          </div>
+          <UiFooter>
             <UiButton 
               :text="'Add member'"
               :layout="'transparent'"
               :size="'sm'"
               class="mr-2"
               @click="addMemberPopup = true; popupToggleVisibility()"
-              />
-              <UiButton 
+            />
+            <UiButton 
               :text="'Change secret'"
               :layout="'transparent'"
               :size="'sm'"
               class="mr-2"
               @click="changeSecretPopup = true; popupToggleVisibility()"
             />
-          </div>
+            <UiButton 
+              :text="'Edit corporation'"
+              :layout="'transparent'"
+              :size="'sm'"
+              class="mr-2"
+              @click="editCorporationPopup = true; popupToggleVisibility()"
+            />
+          </UiFooter>
         </div>
         <div v-else>
           <UiCard>
@@ -358,12 +392,27 @@
       </div>
     </div>
 
+    <ClientOnly v-if="isPopupVisible && editCorporationPopup">
+      <Teleport to="#popup-container">
+        <UiPopup
+          @close-popup="hideAllPopups()"
+        >
+          <div class="p-4">
+            <CorporationsEdit
+              :corporationId="corporationId"
+              @close-popup="hideAllPopups();"
+            />
+          </div>
+        </UiPopup>
+      </Teleport>
+    </ClientOnly>
+
     <ClientOnly v-if="isPopupVisible && addMemberPopup">
       <Teleport to="#popup-container">
         <UiPopup
           @close-popup="hideAllPopups()"
         >
-          <MembersAdd 
+          <MembersAdd
             :corporationId="corporationId"
             @cancel-add-member="hideAllPopups();"
             @sucess-add-member="hideAllPopups();"
@@ -377,7 +426,16 @@
         <UiPopup
           @close-popup="hideAllPopups()"
         >
-          Change Secret Popup
+          <div class="p-4">
+            <CorporationsSecret
+              :corporationId="corporationId"
+              :goBackBtn="false"
+              :cancelBtn="true"
+              :setNewSecret="true"
+              @cancel-change-secret="hideAllPopups()"
+              @corporation-secret-change="hideAllPopups()"
+            />
+          </div>
         </UiPopup>
       </Teleport>
     </ClientOnly>
