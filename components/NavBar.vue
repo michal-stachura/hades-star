@@ -4,7 +4,7 @@
       <NuxtLink to="/">
         <font-awesome-icon icon="fad fa-house" />
       </NuxtLink>
-      <NuxtLink to="/corporations">
+      <NuxtLink to="/corporations/">
         Corporations
       </NuxtLink>
     </div>

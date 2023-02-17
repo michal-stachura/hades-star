@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import { useToast } from 'vue-toastification';
-  import { CorporationDetails } from '@/types/corporation';
+  import * as pkg from "vue-toastification"
+  const { useToast } = pkg
 
   const config = useRuntimeConfig();
   const toast = useToast();
