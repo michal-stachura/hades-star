@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import { Member } from '@/types/member';
   import { PropType } from 'vue';
-  import { useToast } from 'vue-toastification';
   import commonTimezones from '@/data/commonTimezones';
   import wsShipRoles from '@/data/wsShipRoles';
+  import * as pkg from "vue-toastification"
+  const { useToast } = pkg
+
 
   const props = defineProps({
     member: {

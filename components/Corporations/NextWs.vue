@@ -1,7 +1,9 @@
 <script setup lang="ts">
   import { PropType } from 'vue';
-  import { useToast } from "vue-toastification";
   import { Member } from '@/types/member';
+  import * as pkg from "vue-toastification"
+  const { useToast } = pkg
+
   
   const showNextScanButtons = ref(false);
   const sendRequest = ref(false);

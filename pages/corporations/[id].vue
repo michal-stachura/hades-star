@@ -1,8 +1,10 @@
 <script setup lang="ts">
   import { CorporationDetails } from '@/types/corporation';
-  import { useToast } from "vue-toastification";
   import { Member } from '@/types/member';
   import { Attribute } from '@/types/ship-attribute';
+  import * as pkg from "vue-toastification"
+  const { useToast } = pkg
+
 
   const route = useRoute();
   const config = useRuntimeConfig();

@@ -1,7 +1,9 @@
 <script setup lang="ts">
   import { Member } from '@/types/member';
   import { PropType } from 'vue';
-  import { useToast } from 'vue-toastification';
+  import * as pkg from "vue-toastification"
+  const { useToast } = pkg
+
 
   const props = defineProps({
     member: {
