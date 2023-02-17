@@ -10,4 +10,7 @@ export interface Corporation {
 export interface CorporationDetails extends Corporation {
   discord: string;
   wsWins: number;
+  level: number;
+  flagShip: number;
+  requiredInfluence: number;
 }

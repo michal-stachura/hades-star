@@ -1,26 +1,60 @@
 <script setup lang="ts">
   import { PropType } from 'vue';
+  import { useToast } from "vue-toastification";
   import { Member } from '@/types/member';
   
-  const showNextScanButtons = ref(false)
-  const props = defineProps({
-  member: {
-    required: true,
-    type: Object as PropType<Member>
-    }
-  })
-  const nextScan = ref<string | undefined>(props.member.nextWs)
-  const { setWsStatus, clearWsStatus } =  useCorporationDetails()
+  const showNextScanButtons = ref(false);
+  const sendRequest = ref(false);
+  const toast = useToast();
+  const config = useRuntimeConfig();
+  const { getCorporationSecret } = useCorporationDetails();
 
-  function changeNextScan(status: string | undefined) {
-    nextScan.value = status
-    showNextScanButtons.value = false
-    if (status !== undefined) {
-      setWsStatus(props.member.id, status)
-    } else {
-      clearWsStatus(props.member.id)
+  const props = defineProps({
+    member: {
+      required: true,
+      type: Object as PropType<Member>
+    },
+    corporationId: {
+      required: true,
+      type: String
     }
+  });
+  const { setWsStatus, getWsStatus } =  useCorporationDetails();
+  const nextScan = ref<string | undefined>(props.member.nextWs);
+
+  async function changeNextScan(status: string | undefined) {
+    if (sendRequest.value) {
+      return
+    }
+    sendRequest.value = true;
+    showNextScanButtons.value = false;
+
+    const {data, error, pending} = await useFetch<Member>(
+      `${config.apiBaseUrl}/members/${props.member.id}/next-ws/`,
+      {
+        method: 'PATCH',
+        body: {
+          nextWs: status,
+          corporationId: props.corporationId,
+        },
+        headers: [
+          ['Corporation-Secret', getCorporationSecret(props.corporationId)]
+        ],
+      }
+    )
+    if (data.value) {
+      setWsStatus(props.member.id, data.value.nextWs);
+      nextScan.value = getWsStatus(props.member.id);
+    }
+    if (error.value) {
+      if (error.value.response) {
+        toast.error(`${error.value.response.status} - ${error.value.response.statusText}`)
+      }
+    }
+    sendRequest.value = pending.value
   }
+
+
 </script>
 
 
@@ -30,9 +64,14 @@
       class="w-10 text-center mx-auto cursor-pointer"
       @click="showNextScanButtons = !showNextScanButtons"
     >
-      {{ nextScan || '-' }}
+      <span v-if="!sendRequest">
+        {{ nextScan || '-' }}
+      </span>
+      <span v-else>
+        ...
+      </span>
     </UiCard>
-    <div class="absolute left-20 top-0 w-48" v-if="showNextScanButtons">
+    <div class="absolute left-20 top-0 w-48 z-10" v-if="showNextScanButtons">
       <UiButton 
         v-if="nextScan !== 'R'"
         :text="'R'" 
@@ -52,7 +91,7 @@
         @click="changeNextScan('X')"
       />
       <UiButton
-        v-if="nextScan !== '-'"
+        v-if="nextScan !== '-' && nextScan !== ''"
         :text="'-'" 
         class="mr-2"
         @click="changeNextScan('-')"

@@ -2,13 +2,13 @@ import { ShipAttribute } from "@/types/ship-attribute";
 
 export interface Member {
   id: string;
-  username: string;
+  name: string;
   nextWs: string;
-  timeZone?: string;
-  rsLevel?: number;
-  bsLevel?: number;
-  maxMods?: number;
-  asLeader?: boolean;
-  preferences?: string[];
-  shipAttributes?: [ShipAttribute]
+  timeZone: string;
+  rsLevel: number;
+  bsLevel: number;
+  maxMods: number;
+  asLeader: boolean;
+  wsShipRoles: string[];
+  attributes: ShipAttribute
 }
