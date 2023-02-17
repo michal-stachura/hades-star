@@ -20,7 +20,7 @@
   const memberAttributePopup = ref(false);
   const editCorporationPopup = ref(false);
   const detailsVisible = ref(false);
-  const toast = useToast();
+  
   const { corporation, getCorporationSecret } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   const corporationId: string = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
@@ -43,7 +43,7 @@
       isLoading.value = false;
       incorrectSecret.value = false;
     }).catch((error) => {
-      toast.error(`${error.status} - ${error.statusText}`)
+      useToast().error(`${error.status} - ${error.statusText}`)
       isLoading.value = false;
       incorrectSecret.value = true;
     })
@@ -79,7 +79,7 @@
       }
       if (error.value) {
         if (error.value.response) {
-          toast.error(`${error.value.response.status} - ${error.value.response.statusText}`)
+          useToast().error(`${error.value.response.status} - ${error.value.response.statusText}`)
         }
       }
       sendRequest.value = pending.value

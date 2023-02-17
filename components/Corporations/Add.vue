@@ -3,7 +3,6 @@
   const { useToast } = pkg
 
   const config = useRuntimeConfig();
-  const toast = useToast();
 
   const emit = defineEmits(['closePopup', 'successCompanyAdd'])
   const corporationForm = reactive({
@@ -18,7 +17,7 @@
     if (sendRequest.value) return;
 
     if (!corporationForm.name || !corporationForm.secret || corporationForm.name === '' || corporationForm.secret === '') {
-      toast.error('Please provide corporation name and secret.')
+      useToast().error('Please provide corporation name and secret.')
       return;
     }
 
@@ -33,13 +32,13 @@
       )
       
     if (data.value) {
-      toast.success('Corporation added successfully.');
+      useToast().success('Corporation added successfully.');
       const newCorp = {...data.value}
       emit('successCompanyAdd', newCorp);
     }
     
     if (error.value) {
-      toast.error(`${error.value.response.status} - ${error.value.data.detail}`)
+      useToast().error(`${error.value.response.status} - ${error.value.data.detail}`)
     }
     
     sendRequest.value = pending.value

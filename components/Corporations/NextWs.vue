@@ -7,7 +7,7 @@
   
   const showNextScanButtons = ref(false);
   const sendRequest = ref(false);
-  const toast = useToast();
+  
   const config = useRuntimeConfig();
   const { getCorporationSecret } = useCorporationDetails();
 
@@ -50,7 +50,7 @@
     }
     if (error.value) {
       if (error.value.response) {
-        toast.error(`${error.value.response.status} - ${error.value.response.statusText}`)
+        useToast().error(`${error.value.response.status} - ${error.value.response.statusText}`)
       }
     }
     sendRequest.value = pending.value

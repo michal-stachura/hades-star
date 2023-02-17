@@ -29,7 +29,7 @@
   const sendRequest = ref(false);
   const corporationSecret = ref();
   const config = useRuntimeConfig();
-  const toast = useToast();
+  
 
   async function checkSecret(secret: String) {
     if (sendRequest.value) {
@@ -43,7 +43,7 @@
 
     if (error.value) {
       if (error.value.response) {
-        toast.error(`${error.value.response.status} - ${error.value.data.statusText}`)
+        useToast().error(`${error.value.response.status} - ${error.value.data.statusText}`)
       }
     } else {
       setCorporationSecret(secret, props.corporationId);
@@ -57,7 +57,7 @@
       return;
     }
     if (!corporationSecret.value || corporationSecret.value === '') {
-      toast.error('Corporation secret cannot be empty.')
+      useToast().error('Corporation secret cannot be empty.')
       return;
     }
     sendRequest.value = true;
@@ -77,10 +77,10 @@
 
     if (error.value) {
       if (error.value.response) {
-        toast.error(`${error.value.response.status} - ${error.value.data.statusText}`)
+        useToast().error(`${error.value.response.status} - ${error.value.data.statusText}`)
       }
     } else {
-      toast.success('Corporation secret changed. Do not forget to update your tem members.')
+      useToast().success('Corporation secret changed. Do not forget to update your tem members.')
       setCorporationSecret(secret, props.corporationId);
       emit('corporationSecretChange', true)
     }
