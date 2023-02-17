@@ -41,7 +41,7 @@
     >
       <nuxt-img
         v-if="props.iconsOnly"
-        :src="`/images/battery.png`"
+        src="`/images/battery.png`"
         loading="lazy"
       />
       <span v-else>
