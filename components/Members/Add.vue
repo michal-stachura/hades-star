@@ -17,7 +17,7 @@ const { useToast } = pkg
   const { getCorporationSecret, addCorporationMember } = useCorporationDetails();
 
   const config = useRuntimeConfig();
-  const toast = useToast();
+  
   const sendRequest = ref(false);
 
   function formVerify() {
@@ -32,7 +32,7 @@ const { useToast } = pkg
     sendRequest.value = true;
 
     if (!formVerify()) {
-      toast.error('Please provide new member name.')
+      useToast().error('Please provide new member name.')
       sendRequest.value = false;
     } else {
       const { data, error, pending } = await useFetch(
@@ -47,12 +47,12 @@ const { useToast } = pkg
       )
 
       if (data.value) {
-        toast.success('Member added successfully.');
+        useToast().success('Member added successfully.');
         emit('sucessAddMember');
         addCorporationMember({...data.value});
       }
       if (error.value) {
-        toast.error(`${error.value.response.status} - ${error.value.data.detail}`)
+        useToast().error(`${error.value.response.status} - ${error.value.data.detail}`)
       }
       sendRequest.value = pending.value;
     }

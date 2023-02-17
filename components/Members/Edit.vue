@@ -33,7 +33,7 @@
   const { getCorporationSecret, updateCorporationMember } = useCorporationDetails();
   const sendRequest = ref(false);
   const config = useRuntimeConfig();
-  const toast = useToast();
+  
   
   function bsLevel(): Number {
     if (memberForm.bsLevel < 6)
@@ -105,13 +105,13 @@
       )
       
     if (data.value) {
-      toast.success('Member data updated successfully.');
+      useToast().success('Member data updated successfully.');
       updateCorporationMember({...data.value});
       emit('successEditMember');
     }
     
     if (error.value) {
-      toast.error(`${error.value.response.status} - ${error.value.data.detail}`)
+      useToast().error(`${error.value.response.status} - ${error.value.data.detail}`)
     }
     
     sendRequest.value = pending.value

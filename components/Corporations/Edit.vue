@@ -11,7 +11,7 @@
     }
   });
   const config = useRuntimeConfig();
-  const toast = useToast();
+  
 
   const { corporation, getCorporationSecret, setCorporationDetails } = useCorporationDetails();
   const emit = defineEmits(['closePopup'])
@@ -43,13 +43,13 @@
       )
       
     if (data.value) {
-      toast.success('Corporation data updated successfully.');
+      useToast().success('Corporation data updated successfully.');
       setCorporationDetails({...data.value as CorporationDetails});
       emit('closePopup');
     }
     
     if (error.value) {
-      toast.error(`${error.value.response.status} - ${error.value.data.detail}`)
+      useToast().error(`${error.value.response.status} - ${error.value.data.detail}`)
     }
     
     sendRequest.value = pending.value

@@ -16,7 +16,7 @@
     }
   });
   const config = useRuntimeConfig();
-  const toast = useToast();
+  
   const { getCorporationSecret, deleteCorporationMember } = useCorporationDetails();
 
   const emit = defineEmits(['editMember', 'successDeleteMember']);
@@ -40,11 +40,11 @@
 
         onResponse({ request, response, options }) {
           if (response.status === 204) {
-            toast.success('Member removed');
+            useToast().success('Member removed');
             deleteCorporationMember(props.member.id);
             emit('successDeleteMember');
           } else {
-            toast.error(`${response.status} - Error. Please try again later`)
+            useToast().error(`${response.status} - Error. Please try again later`)
           }
         }
       }
