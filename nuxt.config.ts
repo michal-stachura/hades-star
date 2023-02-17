@@ -8,7 +8,6 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxt/image-edge',
-    '@nuxt/image'
   ],
   css: [
     '@fortawesome/fontawesome-svg-core/styles.css',
