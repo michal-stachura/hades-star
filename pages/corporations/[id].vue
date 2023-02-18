@@ -21,7 +21,7 @@
   const editCorporationPopup = ref(false);
   const detailsVisible = ref(false);
   
-  const { corporation, getCorporationSecret } = useCorporationDetails();
+  const { corporation, getCorporationSecret, setCorporationDetails } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   const corporationId: string = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
@@ -39,7 +39,7 @@
       }
       return Promise.reject(response);
     }).then((responseJson) => {
-      corporation.value = responseJson as CorporationDetails
+      setCorporationDetails(responseJson as CorporationDetails)
       isLoading.value = false;
       incorrectSecret.value = false;
     }).catch((error) => {

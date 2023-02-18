@@ -5,7 +5,7 @@ const useCorporationDetails = () => {
   const corporation = useState<CorporationDetails | null>('corporation')
 
   const setCorporationDetails = (data: CorporationDetails) => {
-    corporation.value = data
+    corporation.value = data;
     sortMembersByName();
   }
 
@@ -72,6 +72,7 @@ const useCorporationDetails = () => {
 
   const sortMembersByName = () => {
     if (corporation.value && corporation.value.members) {
+      console.log('sort start')
       // sort by name
       corporation.value.members.sort((a, b) => {
         const nameA = a.name.toLowerCase();
