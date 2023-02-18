@@ -3,6 +3,8 @@
   import { Attribute } from '@/types/ship-attribute';
   
   const { $reslugify } = useNuxtApp();
+  const config = useRuntimeConfig();
+
   const props = defineProps({
     attribute: {
       type: Object as PropType<Attribute>,
@@ -41,7 +43,7 @@
     >
       <nuxt-img
         v-if="props.iconsOnly"
-        :src="`/images/${$slugify(attribute.name)}.png`"
+        :src="`${config.IMAGES_URL}/images/${$slugify(attribute.name)}.png`"
         loading="lazy"
       />
       <span v-else>
