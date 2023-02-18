@@ -43,7 +43,7 @@
     >
       <nuxt-img
         v-if="props.iconsOnly"
-        :src="`${config.IMAGES_URL}/images/${$slugify(attribute.name)}.png`"
+        :src="`${config.imagesUrl}/images/${$slugify(attribute.name)}.png`"
         loading="lazy"
       />
       <span v-else>

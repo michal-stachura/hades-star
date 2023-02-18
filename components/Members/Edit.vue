@@ -230,7 +230,7 @@
         </div>
         <div class="col-span-2 pb-4">
           <nuxt-img
-            :src="`/images/bs-${bsLevel()}.png`"
+            :src="`${config.imagesUrl}/images/bs-${bsLevel()}.png`"
             loading="lazy"
             class="h-24 mx-auto"
           />
