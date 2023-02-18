@@ -6,6 +6,7 @@ const useCorporationDetails = () => {
 
   const setCorporationDetails = (data: CorporationDetails) => {
     corporation.value = data
+    sortMembersByName();
   }
 
   const countMembers = (statuses: string[]) => {
@@ -56,6 +57,21 @@ const useCorporationDetails = () => {
     if (corporation.value && corporation.value.members) {
       corporation.value.members.push(member)
 
+      sortMembersByName();
+    }
+  }
+
+  const deleteCorporationMember = (memberId: string) => {
+    if (corporation.value && corporation.value.members) {
+      const memberIdx = corporation.value.members.findIndex(obj => obj.id === memberId)
+      if (memberIdx > -1) {
+        corporation.value.members.splice(memberIdx, 1);
+      }
+    }
+  }
+
+  const sortMembersByName = () => {
+    if (corporation.value && corporation.value.members) {
       // sort by name
       corporation.value.members.sort((a, b) => {
         const nameA = a.name.toLowerCase();
@@ -69,15 +85,6 @@ const useCorporationDetails = () => {
         }
         return 0;  // equal names
       })
-    }
-  }
-
-  const deleteCorporationMember = (memberId: string) => {
-    if (corporation.value && corporation.value.members) {
-      const memberIdx = corporation.value.members.findIndex(obj => obj.id === memberId)
-      if (memberIdx > -1) {
-        corporation.value.members.splice(memberIdx, 1);
-      }
     }
   }
 
