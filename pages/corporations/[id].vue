@@ -245,6 +245,7 @@
                         v-for="attribute in member.attributes.shield"
                         :key="attribute.name"
                         :attribute="attribute"
+                        class="cursor-pointer"
                         @click="showAttributeDetails(attribute, member)"
                       />
                     </div>
@@ -274,6 +275,7 @@
                         v-for="attribute in member.attributes.support"
                         :key="attribute.name"
                         :attribute="attribute"
+                        class="cursor-pointer"
                         @click="showAttributeDetails(attribute, member)"
                       />
                     </div>
@@ -303,6 +305,7 @@
                         v-for="attribute in member.attributes.mining"
                         :key="attribute.name"
                         :attribute="attribute"
+                        class="cursor-pointer"
                         @click="showAttributeDetails(attribute, member)"
                       />
                     </div>
@@ -332,6 +335,7 @@
                         v-for="attribute in member.attributes.trade"
                         :key="attribute.name"
                         :attribute="attribute"
+                        class="cursor-pointer"
                         @click="showAttributeDetails(attribute, member)"
                       />
                     </div>
