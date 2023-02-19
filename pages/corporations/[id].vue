@@ -488,6 +488,12 @@
               </UiParagraph>
               <UiDivider />
               <UiButton 
+                class="m-1"
+                :text="'0'"
+                :layout="attributeButtonLayout(0, clickedAttribute.value)"
+                @click="setAttributeLevel(clickedAttribute!,  0)"
+              />
+              <UiButton 
                 v-for="idx in clickedAttribute.max"
                 class="m-1"
                 :key="idx"
