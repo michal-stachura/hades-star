@@ -5,7 +5,7 @@ const { isPopupVisible } = usePopup();
 <template>
   <div>
     <NavBar />
-    <div class="mt-14 bg-[url('/images/bck.jpg')] bg-center bg-cover min-h-screen">
+    <div class="mt-14 pb-14 bg-[url('/images/bck.jpg')] bg-center bg-cover min-h-screen">
       <div class="container mx-auto p-4">
         <NuxtPage />
       </div>

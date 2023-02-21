@@ -5,7 +5,7 @@
 </script>
 
 <template>
-  <div class="w-full h-full bg-black/40 backdrop-blur flex justify-center items-center p-4">
+  <div class="w-full h-full fixed bg-black/40 backdrop-blur flex justify-center items-center p-4">
     <div class="bg-slate-800 mx-auto rounded relative">
       <slot />
       <font-awesome-icon
