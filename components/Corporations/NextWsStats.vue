@@ -1,6 +1,13 @@
 <script setup lang="ts">
+  import { isEqual } from 'underscore';
+
   const { countMembers } = useCorporationDetails();
-  
+
+  const selectedMembers = ref<string[]>([])
+
+  function updateSelectedMembers(selectedGroups:string[]): void {
+    selectedMembers.value = selectedGroups
+  }
 </script>
 
 <template>
@@ -12,21 +19,29 @@
     <UiButton 
       :text="`All: ${countMembers([])}`"
       :size="'sm'"
-      class="mr-1"
-      />
-      <UiButton 
+      :layout="selectedMembers.length === 0 ? '' : 'transparent'"
+      @click="updateSelectedMembers([])"
+      class="mr-2"      
+    />
+    <UiButton 
       :text="`R: ${countMembers(['R'])}`"
       :size="'sm'"
-      class="mr-1"
-      />
-      <UiButton 
+      :layout="isEqual(selectedMembers, ['R']) ? '' : 'transparent'"
+      @click="updateSelectedMembers(['R'])"
+      class="mr-2"
+    />
+    <UiButton 
       :text="`R&O: ${countMembers(['R', 'O'])}`"
       :size="'sm'"
-      class="mr-1"
-      />
-      <UiButton 
+      :layout="isEqual(selectedMembers, ['R', 'O']) ? '' : 'transparent'"
+      @click="updateSelectedMembers(['R', 'O'])"
+      class="mr-2"
+    />
+    <UiButton 
       :text="`Pending: ${countMembers(['-'])}`"
+      :layout="isEqual(selectedMembers, ['-']) ? '' : 'transparent'"
       :size="'sm'"
+      @click="updateSelectedMembers(['-'])"
     />
   </div>
 </template>
