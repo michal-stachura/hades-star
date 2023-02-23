@@ -49,7 +49,7 @@
     </UiCard>
 
     <UiFooter>
-      <UiBadge :text="'App version 1.0'" />
+      <UiBadge :text="'App version 1.1'" />
     </UiFooter>
   </div>
 </template>
