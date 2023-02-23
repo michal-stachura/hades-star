@@ -166,15 +166,19 @@
               >
                 Username
               </UiHeaderH2>
-              <UiCard
+              <span
                 v-for="member in corporation.members"
                 :key="member.id"
-                @click="showMemberDetails(member)"
-                class="cursor-pointer"
-                v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
               >
-                {{ member.name }}
-              </UiCard>
+                <UiCard
+                  v-if="member.isVisible"
+                  @click="showMemberDetails(member)"
+                  class="cursor-pointer"
+                  v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
+                >
+                  {{ member.name }}
+                </UiCard>
+              </span>
             </div>
             <div class="ml-2 min-w-fit">
               <UiHeaderH2
@@ -182,12 +186,17 @@
               >
                 Next scan
               </UiHeaderH2>
-              <CorporationsNextWs
+              <span
                 v-for="member in corporation.members"
-                :member="member"
-                :corporationId="corporationId"
-                :key="`nextWS_${member.id}`"
-              />
+                :key="member.id"
+              >
+                <CorporationsNextWs
+                  v-if="member.isVisible"
+                  :member="member"
+                  :corporationId="corporationId"
+                  :key="`nextWS_${member.id}`"
+                />
+              </span>
             </div>
             <div class="flex overflow-x-scroll w-full ml-2">
               <div class="min-w-fit flex">
@@ -211,7 +220,7 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
+                        v-if="member.attributes && member.isVisible"
                         v-for="attribute in member.attributes.weapon"
                         :key="attribute.name"
                         :attribute="attribute"
@@ -241,7 +250,7 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
+                        v-if="member.attributes && member.isVisible"
                         v-for="attribute in member.attributes.shield"
                         :key="attribute.name"
                         :attribute="attribute"
@@ -271,7 +280,7 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
+                        v-if="member.attributes && member.isVisible"
                         v-for="attribute in member.attributes.support"
                         :key="attribute.name"
                         :attribute="attribute"
@@ -301,7 +310,7 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
+                        v-if="member.attributes && member.isVisible"
                         v-for="attribute in member.attributes.mining"
                         :key="attribute.name"
                         :attribute="attribute"
@@ -331,7 +340,7 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
+                        v-if="member.attributes && member.isVisible"
                         v-for="attribute in member.attributes.trade"
                         :key="attribute.name"
                         :attribute="attribute"

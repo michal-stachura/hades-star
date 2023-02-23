@@ -9,9 +9,9 @@ const useCorporationDetails = () => {
     sortMembersByName();
   }
 
-  const countMembers = (statuses: string[]) => {
-    if (statuses.length > 0) {
-      return corporation.value?.members?.reduce((counter, currObj) => statuses.includes(currObj.nextWs) ? ++counter : counter, 0) || 0
+  const countMembers = (wsStatuses: string[]) => {
+    if (wsStatuses.length > 0) {
+      return corporation.value?.members?.reduce((counter, currObj) => wsStatuses.includes(currObj.nextWs) ? ++counter : counter, 0) || 0
     }
     return corporation.value?.members?.length || 0
   }
@@ -45,19 +45,20 @@ const useCorporationDetails = () => {
     localStorage.setItem(corporationId.toString(), JSON.stringify({secret: secret}))
   }
 
-  const updateCorporationMember = (member: Member) => {
-    if (corporation.value && corporation.value.members) {
-      const memberIdx = corporation.value.members.findIndex(obj => obj.id === member.id)
-
-      corporation.value.members[memberIdx] = member
-    }
-  }
-
   const addCorporationMember = (member: Member) => {
     if (corporation.value && corporation.value.members) {
       corporation.value.members.push(member)
 
       sortMembersByName();
+    }
+  }
+  
+  
+  const updateCorporationMember = (member: Member) => {
+    if (corporation.value && corporation.value.members) {
+      const memberIdx = corporation.value.members.findIndex(obj => obj.id === member.id)
+
+      corporation.value.members[memberIdx] = member
     }
   }
 
@@ -67,6 +68,18 @@ const useCorporationDetails = () => {
       if (memberIdx > -1) {
         corporation.value.members.splice(memberIdx, 1);
       }
+    }
+  }
+
+  const hideMembersWithWsStatus = (wsStatuses: string[]) => {
+    if (corporation.value?.members) {
+      let afterFiltering = []
+      if (wsStatuses.length > 0) {
+        afterFiltering = corporation.value.members.map(m => wsStatuses.includes(m.nextWs) ? {...m, isVisible: true} : {...m,  isVisible: false})
+      } else {
+        afterFiltering = corporation.value.members.map(m => {return {...m, isVisible: true}})
+      }
+      corporation.value.members = afterFiltering
     }
   }
 
@@ -99,6 +112,7 @@ const useCorporationDetails = () => {
     updateCorporationMember,
     addCorporationMember,
     deleteCorporationMember,
+    hideMembersWithWsStatus
   }
 }
 

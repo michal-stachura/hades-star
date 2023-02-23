@@ -1,12 +1,14 @@
 <script setup lang="ts">
-  import { isEqual } from 'underscore';
-
-  const { countMembers } = useCorporationDetails();
-
+  const { countMembers, hideMembersWithWsStatus } = useCorporationDetails();
   const selectedMembers = ref<string[]>([])
+
+  function isEqual(toCompare:string[]) {
+    return selectedMembers.value.length === toCompare.length  && selectedMembers.value.every(item => toCompare.includes(item))
+  }
 
   function updateSelectedMembers(selectedGroups:string[]): void {
     selectedMembers.value = selectedGroups
+    hideMembersWithWsStatus(selectedGroups)
   }
 </script>
 
@@ -26,20 +28,20 @@
     <UiButton 
       :text="`R: ${countMembers(['R'])}`"
       :size="'sm'"
-      :layout="isEqual(selectedMembers, ['R']) ? '' : 'transparent'"
+      :layout="isEqual(['R']) ? '' : 'transparent'"
       @click="updateSelectedMembers(['R'])"
       class="mr-2"
     />
     <UiButton 
       :text="`R&O: ${countMembers(['R', 'O'])}`"
       :size="'sm'"
-      :layout="isEqual(selectedMembers, ['R', 'O']) ? '' : 'transparent'"
+      :layout="isEqual(['R', 'O']) ? '' : 'transparent'"
       @click="updateSelectedMembers(['R', 'O'])"
       class="mr-2"
     />
     <UiButton 
       :text="`Pending: ${countMembers(['-'])}`"
-      :layout="isEqual(selectedMembers, ['-']) ? '' : 'transparent'"
+      :layout="isEqual(['-']) ? '' : 'transparent'"
       :size="'sm'"
       @click="updateSelectedMembers(['-'])"
     />

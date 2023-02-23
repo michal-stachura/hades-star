@@ -10,5 +10,6 @@ export interface Member {
   maxMods: number;
   asLeader: boolean;
   wsShipRoles: string[];
-  attributes: ShipAttribute
+  attributes: ShipAttribute;
+  isVisible: boolean;
 }
