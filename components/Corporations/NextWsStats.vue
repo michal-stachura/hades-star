@@ -1,6 +1,15 @@
 <script setup lang="ts">
-  const { countMembers } = useCorporationDetails();
-  
+  const { countMembers, hideMembersWithWsStatus } = useCorporationDetails();
+  const selectedMembers = ref<string[]>([])
+
+  function isEqual(toCompare:string[]) {
+    return selectedMembers.value.length === toCompare.length  && selectedMembers.value.every(item => toCompare.includes(item))
+  }
+
+  function updateSelectedMembers(selectedGroups:string[]): void {
+    selectedMembers.value = selectedGroups
+    hideMembersWithWsStatus(selectedGroups)
+  }
 </script>
 
 <template>
@@ -12,21 +21,29 @@
     <UiButton 
       :text="`All: ${countMembers([])}`"
       :size="'sm'"
-      class="mr-1"
-      />
-      <UiButton 
+      :layout="selectedMembers.length === 0 ? '' : 'transparent'"
+      @click="updateSelectedMembers([])"
+      class="mr-2"      
+    />
+    <UiButton 
       :text="`R: ${countMembers(['R'])}`"
       :size="'sm'"
-      class="mr-1"
-      />
-      <UiButton 
+      :layout="isEqual(['R']) ? '' : 'transparent'"
+      @click="updateSelectedMembers(['R'])"
+      class="mr-2"
+    />
+    <UiButton 
       :text="`R&O: ${countMembers(['R', 'O'])}`"
       :size="'sm'"
-      class="mr-1"
-      />
-      <UiButton 
+      :layout="isEqual(['R', 'O']) ? '' : 'transparent'"
+      @click="updateSelectedMembers(['R', 'O'])"
+      class="mr-2"
+    />
+    <UiButton 
       :text="`Pending: ${countMembers(['-'])}`"
+      :layout="isEqual(['-']) ? '' : 'transparent'"
       :size="'sm'"
+      @click="updateSelectedMembers(['-'])"
     />
   </div>
 </template>
