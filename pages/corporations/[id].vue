@@ -157,6 +157,7 @@
           <CorporationsNextWsStats 
             :members="corporation.members"
           />
+          <CorporationsFilters />
           <div
             v-if="corporation.members && corporation.members.length > 0"
             class="flex mt-2">
