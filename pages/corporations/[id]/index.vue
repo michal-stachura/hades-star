@@ -154,10 +154,16 @@
             class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
             :class="{'max-h-[24rem]': detailsVisible}"
           />
-          <CorporationsNextWsStats 
-            :members="corporation.members"
-          />
-          <CorporationsFilters />
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
+            <div>
+              <CorporationsNextWsStats 
+                :members="corporation.members"
+              />
+            </div>
+            <div>
+              <CorporationsFiltersCard />
+            </div>
+          </div>
           <div
             v-if="corporation.members && corporation.members.length > 0"
             class="flex mt-2">
