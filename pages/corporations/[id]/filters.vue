@@ -1,16 +1,9 @@
 <script setup lang="ts">
   const route = useRoute();
   const { corporation } = useCorporationDetails();
-  const addFilter = ref(false);
-
-  const filterForm = reactive({
-    name: '',
-    corporation: corporation.value!.id,
-  })
-
-  function saveForm() {
-    console.log('Saving form...');
-  }
+  const addFilter = ref(true);
+  const config = useRuntimeConfig();
+  
 </script>
 
 <template>
@@ -35,22 +28,9 @@
         <UiHeaderH2>Add new filter</UiHeaderH2>
         <UiParagraph>Setup criteria for new filter.</UiParagraph>
         <UiDivider />
-        <form @submit.prevent="saveForm">
-          <UiInputText 
-            v-model="filterForm.name"
-            :value="filterForm.name"
-            :name="'filterName'"
-            :label="'Filter name'"
-            :css-classes="'w-full lg:w-96'"
-          />
-        </form>
-          List of criteria
-        <UiDivider />
-        <UiButton 
-          :text="'Cancel'"
-          :layout="'transparent'"
-          :size="'sm'"
-          @click="addFilter = false"
+        <CorporationsFiltersForm 
+          :corporation-id="corporation.id"
+          @close-popup="addFilter = false"
         />
       </UiCard>
     </div>
