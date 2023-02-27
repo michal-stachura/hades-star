@@ -2,8 +2,14 @@
   const route = useRoute();
   const { corporation } = useCorporationDetails();
   const addFilter = ref(true);
+  const filterName = ref();
   const config = useRuntimeConfig();
   
+  function setFilterName(name) {
+    filterName.value = name;
+  }
+
+
 </script>
 
 <template>
@@ -25,12 +31,13 @@
     </div>
     <div v-else>
       <UiCard>
-        <UiHeaderH2>Add new filter</UiHeaderH2>
+        <UiHeaderH2>Add new filter: {{ filterName }}</UiHeaderH2>
         <UiParagraph>Setup criteria for new filter.</UiParagraph>
         <UiDivider />
         <CorporationsFiltersForm 
           :corporation-id="corporation.id"
           @close-popup="addFilter = false"
+          @set-filter-name="setFilterName"
         />
       </UiCard>
     </div>

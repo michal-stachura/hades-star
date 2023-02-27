@@ -55,6 +55,7 @@
   <button
     class="transition-all duration-300 hover:scale-110"
     :class="buttonLayout()"
+    :type="props.type"
   >
     {{ props.text }}
   </button>

@@ -2,7 +2,8 @@ export interface Attribute {
   id: string,
   name: string,
   value: number,
-  max: number
+  max: number,
+  current: number
 }
 
 export interface ShipAttribute {
