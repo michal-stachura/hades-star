@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ShipAttribute, Attribute } from "@/types/ship-attribute";
-import { useToast } from "vue-toastification";
+  import { useToast } from "vue-toastification";
   type filterAttributeType = Attribute & {
     type: String
   }
@@ -16,9 +16,11 @@ import { useToast } from "vue-toastification";
       required: true,
     },
   });
-  const emit = defineEmits(['closePopup', 'setFilterName'])
+  const emit = defineEmits(['closePopup'])
 
   const formStep = ref(1)
+  const formProgress = ref<number>(0)
+
   const selectedAttributesId = ref<String[]>([]);
   const selectedAttributes = ref<filterAttributeType[]>([]);
 
@@ -36,6 +38,7 @@ import { useToast } from "vue-toastification";
     } else {
       selectedAttributesId.value.push(attribute.id)
     }
+    setFormProgress()
   }
 
 
@@ -69,6 +72,17 @@ import { useToast } from "vue-toastification";
     attribute.type = type;
   }
 
+  function setFormProgress():void {
+    let progress = 0;
+    if (filterForm.name.trim().length > 0) {
+      progress += 25
+    }
+    if (selectedAttributesId.value.length > 0) {
+      progress += 25
+    }
+    formProgress.value = progress
+  }
+
   function saveForm() {
     console.log('Saving form...');
   }
@@ -78,13 +92,29 @@ import { useToast } from "vue-toastification";
 <template>
   <div>
     <form @submit.prevent="saveForm" :corporation-id="corporationId">
+      <div class="flex">
+        <div class="grow">
+          <UiHeaderH1>Filter form</UiHeaderH1>
+          <UiParagraph>Welcome Commander.</UiParagraph>
+          <UiParagraph>
+            Here you can define or edit filter which will be helpful in your WhiteStar Campaigns.<br />All filters will be availiable to use by the rest of your Corporation members
+          </UiParagraph>
+        </div>
+        <div class="grow-0">
+          <UiCircleProgress
+            :percent="formProgress"
+          />
+        </div>
+      </div>
+
+      <UiDivider />
       <UiInputText
         v-model="filterForm.name"
         :value="filterForm.name"
         :name="'filterName'"
         :label="'Filter name'"
         :css-classes="'w-full lg:w-96'"
-        @input="emit('setFilterName', filterForm.name)"
+        @input="setFormProgress"
       />
       <div
         v-if="attributes && formStep === 1"
@@ -165,7 +195,7 @@ import { useToast } from "vue-toastification";
         <UiButton
           class="mr-2 mb-2"
           :text="'Next'"
-          :disabled="selectedAttributesId.length === 0 ? true : false"
+          :disabled="selectedAttributesId.length === 0 && filterForm.name === '' ? true : false"
           @click="goToStep2()"
         />
       </div>
@@ -238,9 +268,6 @@ import { useToast } from "vue-toastification";
           @click="formStep = 1"
         />
       </div>
-      <UiCard :layout="'dark'">
-        <pre class="text-sm">{{attributes}}</pre>
-      </UiCard>
     </form>
     <UiDivider />
 
