@@ -21,6 +21,11 @@
       type: String,
       required: false,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   })
   
@@ -53,9 +58,10 @@
 
 <template>
   <button
-    class="transition-all duration-300 hover:scale-110"
+    class="transition-all duration-300 hover:scale-110 disabled:hover:scale-100 disabled:opacity-80"
     :class="buttonLayout()"
     :type="props.type"
+    :disabled="props.disabled"
   >
     {{ props.text }}
   </button>
