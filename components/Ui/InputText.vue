@@ -58,7 +58,7 @@
       :disabled="disabled"
       :class="cssClasses"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-      class="bg-white/60 h-10 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-200 rounded text-gray-800 transition-all duration-500 px-2"
+      class="bg-white/90 h-10 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-200 rounded text-gray-800 transition-all duration-500 px-2"
     />
     <SharedFormHelpText v-if="helpText" 
       :helpText="helpText"

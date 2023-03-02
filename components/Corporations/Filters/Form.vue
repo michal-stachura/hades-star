@@ -9,6 +9,7 @@
   const config = useRuntimeConfig();
   const toast = useToast();
   const { getMemberShipAttributes } = useShipAttributes();
+  const { getCorporationSecret } = useCorporationDetails();
 
   const props = defineProps({
     corporationId: {
@@ -20,13 +21,14 @@
 
   const formStep = ref(1)
   const formProgress = ref<number>(0)
+  const submitAllowed = ref<boolean>(false)
 
   const selectedAttributesId = ref<String[]>([]);
   const selectedAttributes = ref<filterAttributeType[]>([]);
 
   const filterForm = reactive({
     name: '',
-    corporationId: props.corporationId,
+    corporationId: props.corporationId
   });
 
 
@@ -67,6 +69,7 @@
       } else if (attribute.current + value < 0) {
         attribute.current = 0;
       }
+      setFormProgress()
   }
   function setAttributeValueType(attribute: filterAttributeType, type: string) {
     attribute.type = type;
@@ -80,11 +83,42 @@
     if (selectedAttributesId.value.length > 0) {
       progress += 25
     }
+    if (selectedAttributes.value.length > 0) {
+      const progressLeft = 100 - progress
+      const attributesWitoutZero = selectedAttributes.value.filter((attribute) => {
+        return attribute.current !== 0
+      })
+      const progressToAdd = (attributesWitoutZero.length * 100) / selectedAttributes.value.length
+      progress += (progressToAdd / 2)
+    }
     formProgress.value = progress
+    submitAllowed.value = formProgress.value === 100 ? true : false;
   }
 
-  function saveForm() {
-    console.log('Saving form...');
+  async function saveForm() {
+    if (!submitAllowed.value) {
+      toast.error("Please fill all values in selected attributes")
+      return
+    }
+
+    const { data, error } = await useFetch(
+      `${config.apiBaseUrl}/corporations/add-filter/`,
+      {
+        method: 'POST',
+        body: {...filterForm, selectedAttributes: selectedAttributes.value},
+        headers: [
+          ['Corporation-Secret', getCorporationSecret(props.corporationId)]
+        ]
+      }
+    )
+
+    if (data.value) {
+      toast.success('Filter added successfully.');
+    }
+    if (error.value && error.value.response) {
+      toast.error(`${error.value.response.status} - ${error.value.data.detail}`)
+    }
+    
   }
 
 </script>
@@ -102,7 +136,10 @@
         </div>
         <div class="grow-0">
           <UiCircleProgress
-            :percent="formProgress"
+            :progress="formProgress"
+            :animation-duration="300"
+            :progress-thickness="5"
+            :progress-color="'text-gray-500'"
           />
         </div>
       </div>
@@ -262,20 +299,18 @@
         </div>
         
 
+        <UiDivider class="mt-8"/>
         <UiButton
           class="mr-2 mb-2"
           :text="'Prev'"
-          @click="formStep = 1"
+          @click="formStep = 1; selectedAttributes = []; setFormProgress()"
+        />
+        <UiButton
+          class="mr-2 mb-2"
+          :text="'Save'"
+          @click="saveForm"
         />
       </div>
     </form>
-    <UiDivider />
-
-    <UiButton
-      :text="'Cancel'"
-      :layout="'transparent'"
-      :size="'sm'"
-      @click="emit('closePopup')"
-    />
   </div>
 </template>

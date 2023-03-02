@@ -1,22 +1,107 @@
 <script setup lang="ts">
   const props = defineProps({
-    percent: {
-      type: Number,
+    progress: {
       required: true,
-      default: 0
-    }
+      type: Number,
+    },
+    animationDuration: {
+      required: false,
+      type: Number,
+      default: 1000,
+    },
+    animationDelay: {
+      required: false,
+      type: Number,
+      default: 0,
+    },
+    decimalPrecision: {
+      required: false,
+      type: Number,
+      default: 0,
+    },
+    textLayout: {
+      required: false,
+      type: String,
+      default: 'text-lg'
+    },
+    radius: {
+      required: false,
+      type: Number,
+      default: 30
+    },
+    progressRadius: {
+      required: false,
+      type: Number,
+      default: 30
+    },
+    thickness: {
+      required: false,
+      type: Number,
+      default: 4
+    },
+    cx: {
+      required: false,
+      type: Number,
+      default: 40
+    },
+    cy: {
+      required: false,
+      type: Number,
+      default: 40
+    },
+    color: {
+      required: false,
+      type: String,
+      default: 'text-gray-200'
+    },
+    progressColor: {
+      required: false,
+      type: String,
+      default: 'text-gray-800'
+    },
+    progressThickness: {
+      required: false,
+      type: Number,
+      default: 2
+    },
+    progressCx: {
+      required: false,
+      type: Number,
+      default: 40
+    },
+    progressCy: {
+      required: false,
+      type: Number,
+      default: 40
+    },
+    containerWidth: {
+      required: false,
+      type: String,
+      default: 'w-20'
+    },
+    containerHeight: {
+      required: false,
+      type: String,
+      default: 'h-20'
+    },
   })
 
-  const progress = ref(props.percent)
-  const circumference = 15 * 2 * Math.PI
+  const progress = ref<number>(props.progress);
+  const circumference:number = props.progressRadius * 2 * Math.PI
+
+  watch(() => props.progress, (newValue, _) => {
+    setTimeout(() => {
+      smoothProgressChange(newValue)
+    }, props.animationDelay)
+  })
 
   function smoothProgressChange(target: number): void  {
-    const duration = 300; // animation time
+    const duration = props.animationDuration; // animation time
     const start = performance.now(); // start animation time
     const initialProgress = progress.value;
 
     function animate() {
-      const now = performance.now(); // current animatio time
+      const now = performance.now(); // current animation time
       const timeElapsed = now - start;
       const progressDelta = target - initialProgress;
       progress.value = initialProgress + progressDelta * (timeElapsed / duration);
@@ -31,46 +116,42 @@
 
     animate();
   }
-
-  watch(() => props.percent, (newValue, _) => {
-    smoothProgressChange(newValue)
-  })
 </script>
 
 <template>
   <div>
     <div
-      x-data="scrollProgress"
       class="inline-flex items-center justify-center overflow-hidden rounded-full"
     >
-      <!-- Building a Progress Ring: https://css-tricks.com/building-progress-ring-quickly/ -->
-      <svg class="w-10 h-10">
+      <svg
+        :class="`${props.containerWidth} ${props.containerHeight}`">
         <circle
-          class="text-gray-200"
-          stroke-width="4"
+          :class="`${props.color}`"
+          :stroke-width="props.thickness"
           stroke="currentColor"
           fill="transparent"
-          r="15"
-          cx="20"
-          cy="20"
+          :r="props.radius"
+          :cx="props.cx"
+          :cy="props.cy"
         />
         <circle
-          class="text-gray-800"
-          stroke-width="2"
+          :class="`${props.progressColor}`"
+          :stroke-width="props.progressThickness"
           :stroke-dasharray="circumference"
           :stroke-dashoffset="circumference - progress / 100 * circumference"
-          stroke-linecap="round"
+          stroke-linecap="butt"
           stroke="currentColor"
           fill="transparent"
-          r="15"
-          cx="20"
-          cy="20"
+          :r="props.progressRadius"
+          :cx="props.progressCx"
+          :cy="props.progressCy"
         />
       </svg>
-      <span class="absolute text-[9px] text-gray-200">
-        {{ progress.toFixed(0) }} %
+      <span
+        :class="`absolute ${props.textLayout}`"
+      >
+        {{ progress.toFixed(props.decimalPrecision) }} %
       </span>
     </div>
-
   </div>
 </template>
