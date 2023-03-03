@@ -462,7 +462,7 @@
       </Teleport>
     </ClientOnly>
 
-    <ClientOnly v-if="isPopupVisible && memberDetailsPopup">
+    <ClientOnly v-if="isPopupVisible && memberDetailsPopup && clickedMember">
       <Teleport to="#popup-container">
         <UiPopup
           @close-popup="hideAllPopups()"
@@ -495,7 +495,9 @@
         <UiPopup
           @close-popup="hideAllPopups()"
         >
-          <div class="p-4">
+          <div
+            v-if="clickedAttribute"
+            class="p-4">
             <UiHeaderH2>{{ $reslugify(clickedAttribute.name) }}</UiHeaderH2>
             <UiDivider />
             <div class="text-center">

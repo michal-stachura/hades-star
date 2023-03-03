@@ -2,8 +2,6 @@
   const route = useRoute();
   const { corporation } = useCorporationDetails();
   const addFilter = ref(true);
-  const filterName = ref();
-  const config = useRuntimeConfig();
 </script>
 
 <template>
@@ -25,10 +23,7 @@
     </div>
     <div v-else>
       <UiCard>
-        <CorporationsFiltersForm 
-          :corporation-id="corporation.id"
-          @close-popup="addFilter = false"
-        />
+        <CorporationsFiltersForm />
       </UiCard>
     </div>
     

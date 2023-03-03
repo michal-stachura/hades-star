@@ -9,15 +9,7 @@
   const config = useRuntimeConfig();
   const toast = useToast();
   const { getMemberShipAttributes } = useShipAttributes();
-  const { getCorporationSecret } = useCorporationDetails();
-
-  const props = defineProps({
-    corporationId: {
-      type: String,
-      required: true,
-    },
-  });
-  const emit = defineEmits(['closePopup'])
+  const { corporation, getCorporationSecret } = useCorporationDetails();
 
   const formStep = ref(1)
   const formProgress = ref<number>(0)
@@ -28,7 +20,6 @@
 
   const filterForm = reactive({
     name: '',
-    corporationId: props.corporationId
   });
 
 
@@ -61,13 +52,13 @@
   }
 
   function setAttributeValue(attribute: filterAttributeType, value: number) {
-    if (attribute.current + value >= 0 && attribute.current + value <= attribute.max) {
-        attribute.current += value;
-        if (attribute.current === attribute.max) {
-          toast.info(`${attribute.current} is maximum for ${attribute.name}`);
+    if (attribute.value + value >= 0 && attribute.value + value <= attribute.max) {
+        attribute.value += value;
+        if (attribute.value === attribute.max) {
+          toast.info(`${attribute.value} is maximum for ${attribute.name}`);
         }
-      } else if (attribute.current + value < 0) {
-        attribute.current = 0;
+      } else if (attribute.value + value < 0) {
+        attribute.value = 0;
       }
       setFormProgress()
   }
@@ -86,7 +77,7 @@
     if (selectedAttributes.value.length > 0) {
       const progressLeft = 100 - progress
       const attributesWitoutZero = selectedAttributes.value.filter((attribute) => {
-        return attribute.current !== 0
+        return attribute.value !== 0
       })
       const progressToAdd = (attributesWitoutZero.length * 100) / selectedAttributes.value.length
       progress += (progressToAdd / 2)
@@ -101,31 +92,36 @@
       return
     }
 
-    const { data, error } = await useFetch(
-      `${config.apiBaseUrl}/corporations/add-filter/`,
-      {
-        method: 'POST',
-        body: {...filterForm, selectedAttributes: selectedAttributes.value},
-        headers: [
-          ['Corporation-Secret', getCorporationSecret(props.corporationId)]
-        ]
+    if (corporation.value) {
+      const { data, error } = await useFetch(
+        `${config.apiBaseUrl}/corporations/${corporation.value.id}/add-filter/`,
+        {
+          method: 'POST',
+          body: {...filterForm, conditions: selectedAttributes.value},
+          headers: [
+            ['Corporation-Secret', getCorporationSecret(corporation.value.id)]
+          ]
+        }
+      )
+      
+      if (data.value) {
+        toast.success('Filter added successfully.');
       }
-    )
+      if (error.value && error.value.response) {
+        toast.error(`${error.value.response.status} - ${error.value.data.detail}`)
+      }
+    }
 
-    if (data.value) {
-      toast.success('Filter added successfully.');
-    }
-    if (error.value && error.value.response) {
-      toast.error(`${error.value.response.status} - ${error.value.data.detail}`)
-    }
     
   }
 
 </script>
 
 <template>
-  <div>
-    <form @submit.prevent="saveForm" :corporation-id="corporationId">
+  <div
+    v-if="corporation"
+  >
+    <form @submit.prevent="saveForm" :corporation-id="corporation.id">
       <div class="flex">
         <div class="grow">
           <UiHeaderH1>Filter form</UiHeaderH1>
@@ -262,7 +258,7 @@
                   <UiCard
                     :class="'rounded-full w-20 h-20 flex items-center justify-center'"
                   >
-                    <UiHeaderH1 :class="'mt-4 mx-4'">{{  attribute.current }}</UiHeaderH1>
+                    <UiHeaderH1 :class="'mt-4 mx-4'">{{ attribute.value }}</UiHeaderH1>
                   </UiCard>
                 </div>
                 <div class="flex items-center">
