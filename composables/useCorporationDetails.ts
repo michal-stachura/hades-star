@@ -1,5 +1,29 @@
 import { CorporationDetails } from '@/types/corporation';
 import { Member } from '@/types/member';
+import { Condition } from '@/types/filter';
+
+function attributeGroup(filterId: string): string {
+  const weaponIds = ['BATTERY', 'LASER', 'MASS_BATTERY', 'DUAL_LASER', 'BARRAGE', 'DART_LAUNCHER'];
+  const shieldIds = ['DELTA_SHIELD', 'PASSIVE_SHIELD', 'OMEGA_SHIELD', 'MIRROR_SHIELD', 'BLAST_SHIELD', 'AREA_SHIELD'];
+  const miningIds = ["MINING_BOOST", "HYDROGEN_BAY_EXTENSION", "ENRICH", "REMOTE_MINING", "HYDROGEN_UPLOAD", "MINING_UNITY","CRUNCH", "GENESIS", "HYDROGEN_ROCKET", "MINING_DRONE"];
+  const supportIds = ["EMP", "TELEPORT", "RED_STAR_LIFE_EXTENDER", "REMOTE_REPAIR", "TIME_WRAP", "UNITY", "SANCTUARY", "STEALTH", "FORTIFY", "IMPULSE", "ALPHA_ROCKET","SALVAGE", "SUPRESS", "DESTINY", "BARRIER", "VENEGANCE", "DELTA_ROCKET", "LEAP", "BOND", "LASER_TURRET", "ALPHA_DRONE", "SUSPEND", "OMEGA_ROCKET", "REMOTE_BOMB"];
+  const tradeIds = ["CARGO_BAY_EXTENSION", "SHIPMENT_COMPUTER", "TRADE_BOOST", "RUSH", "TRADE_BURST", "SHIPMENT_DRONE", "OFFLOAD", "SHIPMENT_BEAM", "ENTRUST", "DISPATCH", "RECALL", "RELIC_DRONE"];
+  // console.log(filterId)
+  if (weaponIds.includes(filterId)) {
+    return 'weapon'
+  } else if (shieldIds.includes(filterId)) {
+    return 'shield'
+  } else if (miningIds.includes(filterId)) {
+    return 'mining'
+  } else if (supportIds.includes(filterId)) {
+    return 'support'
+  } else if (tradeIds.includes(filterId)) {
+    return 'trade'
+  } else {
+    return ''
+  }
+}
+
 
 const useCorporationDetails = () => {
   const corporation = useState<CorporationDetails | null>('corporation')
@@ -83,6 +107,26 @@ const useCorporationDetails = () => {
     }
   }
 
+  const filterMembersByTechLevel = (conditions: Condition[]): void => {
+    if (corporation.value?.members) {
+      let afterFiltering = []
+      
+      console.log(corporation.value.members)
+
+      if (conditions.length > 0) {
+        conditions.forEach(condition => {
+          const attributeGroupName = attributeGroup(condition.id)
+          console.log(attributeGroupName)
+          corporation.value.members.map(m => {
+            console.log(m.attributes[attributeGroupName])
+          })
+        })
+      } else {
+        afterFiltering = corporation.value.members.map(m => {return {...m, isVisible: true}})
+      }
+    }
+  }
+
   const sortMembersByName = () => {
     if (corporation.value && corporation.value.members) {
       // sort by name
@@ -112,7 +156,8 @@ const useCorporationDetails = () => {
     updateCorporationMember,
     addCorporationMember,
     deleteCorporationMember,
-    hideMembersWithWsStatus
+    hideMembersWithWsStatus,
+    filterMembersByTechLevel
   }
 }
 
