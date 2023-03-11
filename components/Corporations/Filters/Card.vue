@@ -4,14 +4,14 @@
   const route = useRoute()
   const { corporation, filterMembersByTechLevel } = useCorporationDetails();
 
-  const clickedFilters = ref<string[]>([])
+  const clickedFilter = ref<string>()
   const conditions = ref<Condition[]>([])
 
-  function toggleFilter(filterId: string): void {
-    if (clickedFilters.value.includes(filterId)) {
-      clickedFilters.value.splice(clickedFilters.value.indexOf(filterId), 1)
+  function toggleFilter(filterId: string): void {    
+    if (clickedFilter.value === filterId) {
+      clickedFilter.value = ''
     } else {
-      clickedFilters.value.push(filterId)
+      clickedFilter.value = filterId
     }
     filterMembers()
   }
@@ -19,30 +19,15 @@
   function filterMembers(): void {
     if (corporation.value) {
       conditions.value = []
-      const chosenFilters = corporation.value.filters.filter(filter => clickedFilters.value.includes(filter.id))
-
-      chosenFilters.forEach(filter => {
-        filter.conditions.forEach(condition => {
+      const chosenFilter = corporation.value.filters.filter(filter => filter.id === clickedFilter.value)
+      if (chosenFilter.length > 0) {
+        chosenFilter[0].conditions.forEach(condition => {
           conditions.value.push(condition)
         })
-      })
-
-      filterMembersByTechLevel(conditions.value)
-
-      // console.log(conditions.value)
-      // chosenFilters.forEach(filter => {
-      //   conditions.value.push(filter)
-      //   filter.conditions.forEach(condition => {
-      //     const attrGroup = attributeGroup(condition.id)
-      //     console.log(attrGroup)
-      //     // TODO: filter members with conditions and add thenm to finall list of members
-
-      //   })
-
-      //   console.log(filter)
-      // })
-      // console.log(chosenFilters)
-      // console.log(corporation.value.members)
+        filterMembersByTechLevel(conditions.value)
+      } else {
+        filterMembersByTechLevel([])
+      }
     }
   }
 </script>
@@ -62,7 +47,7 @@
           :id="filter.id"
           :text="filter.name.toString()"
           :size="'sm'"
-          :layout="clickedFilters.includes(filter.id) ? '' : 'transparent'"
+          :layout="clickedFilter === filter.id ? '' : 'transparent'"
           :class="'mr-2'"
           @click="toggleFilter(filter.id)"
         />

@@ -1,27 +1,28 @@
 import { CorporationDetails } from '@/types/corporation';
 import { Member } from '@/types/member';
 import { Condition } from '@/types/filter';
+import { ShipAttribute } from '@/types/ship-attribute';
 
-function attributeGroup(filterId: string): string {
+function attributeGroup(filterId: string): keyof ShipAttribute {
   const weaponIds = ['BATTERY', 'LASER', 'MASS_BATTERY', 'DUAL_LASER', 'BARRAGE', 'DART_LAUNCHER'];
   const shieldIds = ['DELTA_SHIELD', 'PASSIVE_SHIELD', 'OMEGA_SHIELD', 'MIRROR_SHIELD', 'BLAST_SHIELD', 'AREA_SHIELD'];
   const miningIds = ["MINING_BOOST", "HYDROGEN_BAY_EXTENSION", "ENRICH", "REMOTE_MINING", "HYDROGEN_UPLOAD", "MINING_UNITY","CRUNCH", "GENESIS", "HYDROGEN_ROCKET", "MINING_DRONE"];
   const supportIds = ["EMP", "TELEPORT", "RED_STAR_LIFE_EXTENDER", "REMOTE_REPAIR", "TIME_WRAP", "UNITY", "SANCTUARY", "STEALTH", "FORTIFY", "IMPULSE", "ALPHA_ROCKET","SALVAGE", "SUPRESS", "DESTINY", "BARRIER", "VENEGANCE", "DELTA_ROCKET", "LEAP", "BOND", "LASER_TURRET", "ALPHA_DRONE", "SUSPEND", "OMEGA_ROCKET", "REMOTE_BOMB"];
   const tradeIds = ["CARGO_BAY_EXTENSION", "SHIPMENT_COMPUTER", "TRADE_BOOST", "RUSH", "TRADE_BURST", "SHIPMENT_DRONE", "OFFLOAD", "SHIPMENT_BEAM", "ENTRUST", "DISPATCH", "RECALL", "RELIC_DRONE"];
-  // console.log(filterId)
+  
+  let strKeyName: keyof ShipAttribute = 'weapon'
   if (weaponIds.includes(filterId)) {
-    return 'weapon'
+    strKeyName = 'weapon'
   } else if (shieldIds.includes(filterId)) {
-    return 'shield'
+    strKeyName = 'shield'
   } else if (miningIds.includes(filterId)) {
-    return 'mining'
+    strKeyName = 'mining'
   } else if (supportIds.includes(filterId)) {
-    return 'support'
+    strKeyName = 'support'
   } else if (tradeIds.includes(filterId)) {
-    return 'trade'
-  } else {
-    return ''
-  }
+    strKeyName = 'trade'
+  } 
+  return strKeyName
 }
 
 
@@ -109,21 +110,41 @@ const useCorporationDetails = () => {
 
   const filterMembersByTechLevel = (conditions: Condition[]): void => {
     if (corporation.value?.members) {
-      let afterFiltering = []
+      let afterFiltering = []      
       
-      console.log(corporation.value.members)
-
       if (conditions.length > 0) {
+        let filteredMembers: Member[] | undefined = []
         conditions.forEach(condition => {
+          console.log(condition)
           const attributeGroupName = attributeGroup(condition.id)
-          console.log(attributeGroupName)
-          corporation.value.members.map(m => {
-            console.log(m.attributes[attributeGroupName])
-          })
+          if (condition.type === 'lower') {
+            filteredMembers = corporation.value?.members.filter(
+              member => member.attributes[attributeGroupName].some(
+                attribute => attribute.name === condition.id && attribute.value <= condition.set
+              )
+            )
+          } else if (condition.type === 'bigger') {
+            filteredMembers = corporation.value?.members.filter(
+              member => member.attributes[attributeGroupName].some(
+                attribute => attribute.name === condition.id && attribute.value >= condition.set
+              )
+            )
+          } else if (condition.type === 'equal') {
+            filteredMembers = corporation.value?.members.filter(
+              member => member.attributes[attributeGroupName].some(
+                attribute => attribute.name === condition.id && attribute.value === condition.set
+              )
+            )
+          }
+
         })
+        afterFiltering = corporation.value?.members.map(m => filteredMembers?.includes(m) ? {...m, isVisible: true} : {...m, isVisible: false})
       } else {
         afterFiltering = corporation.value.members.map(m => {return {...m, isVisible: true}})
       }
+
+      corporation.value.members = afterFiltering
+      
     }
   }
 
