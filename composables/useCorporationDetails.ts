@@ -25,9 +25,62 @@ function attributeGroup(filterId: string): keyof ShipAttribute {
   return strKeyName
 }
 
+// async function fetchCorporationDataFromServer(corporationId: string, corporationSecret: string) {
+//   console.log('!!! fetch corp data from server')
+//   await fetch(
+//     `${config.apiBaseUrl}/corporations/${corporationId}/`,
+//     {
+//       headers: [['Corporation-Secret', corporationSecret]],
+//     }
+//   ).then((response) => {
+//     if (response.ok) {
+//       return response.json()
+//     }
+//     return Promise.reject(response);
+//   }).then((responseJson) => {
+//     return responseJson as CorporationDetails
+//     // setCorporationDetails(responseJson as CorporationDetails)
+//     // isLoading.value = false;
+//     // incorrectSecret.value = false;
+//   }).catch((error) => {
+//     return error
+//     // useToast().error(`${error.status} - ${error.statusText}`)
+//     // isLoading.value = false;
+//     // incorrectSecret.value = true;
+//   })
+// }
+
 
 const useCorporationDetails = () => {
   const corporation = useState<CorporationDetails | null>('corporation')
+  const loadingCorporation = useState<boolean>('loadingCorporation', () => true)
+
+  const fetchCorporationData = async (corporationId: string) => {
+    const config = useRuntimeConfig();
+    corporation.value = null;
+    loadingCorporation.value = true;
+
+    await fetch(
+      `${config.apiBaseUrl}/corporations/${corporationId}/`,
+      {
+        headers: [['Corporation-Secret', getCorporationSecret(corporationId)]],
+      }
+    ).then((response) => {
+      if (response.ok) {
+        return response.json()
+      }
+      return Promise.reject(response);
+    }).then((responseJson) => {
+      setCorporationDetails(responseJson as CorporationDetails)
+      loadingCorporation.value = false
+      // isLoading.value = false;
+      // incorrectSecret.value = false;
+    }).catch((error) => {
+      // useToast().error(`${error.status} - ${error.statusText}`)
+      // isLoading.value = false;
+      // incorrectSecret.value = true;
+    })
+  }
 
   const setCorporationDetails = (data: CorporationDetails) => {
     corporation.value = data;
@@ -168,17 +221,19 @@ const useCorporationDetails = () => {
 
   return {
     corporation,
+    loadingCorporation,
     setCorporationDetails,
     setWsStatus,
     getWsStatus,
     countMembers,
+    fetchCorporationData,
     getCorporationSecret,
     setCorporationSecret,
     updateCorporationMember,
     addCorporationMember,
     deleteCorporationMember,
     hideMembersWithWsStatus,
-    filterMembersByTechLevel
+    filterMembersByTechLevel,
   }
 }
 

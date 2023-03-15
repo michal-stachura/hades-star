@@ -8,7 +8,6 @@
 
   const route = useRoute();
   const config = useRuntimeConfig();
-  const isLoading = ref(true);
   const sendRequest = ref(false);
   const incorrectSecret = ref(false);
   const editMember = ref(false);
@@ -21,33 +20,36 @@
   const editCorporationPopup = ref(false);
   const detailsVisible = ref(false);
   
-  const { corporation, getCorporationSecret, setCorporationDetails } = useCorporationDetails();
+  const { corporation, loadingCorporation, getCorporationSecret, fetchCorporationData, setCorporationDetails } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   const corporationId: string = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
-  async function fetchCorporationData() {
-    corporation.value = null;
+  fetchCorporationData(corporationId);
+
+
+  // async function fetchCorporationDataI() {
+  //   corporation.value = null;
     
-    await fetch(
-      `${config.apiBaseUrl}/corporations/${route.params.id}/`,
-      {
-        headers: [['Corporation-Secret', getCorporationSecret(corporationId)]],
-      }
-    ).then((response) => {
-      if (response.ok) {
-        return response.json()
-      }
-      return Promise.reject(response);
-    }).then((responseJson) => {
-      setCorporationDetails(responseJson as CorporationDetails)
-      isLoading.value = false;
-      incorrectSecret.value = false;
-    }).catch((error) => {
-      useToast().error(`${error.status} - ${error.statusText}`)
-      isLoading.value = false;
-      incorrectSecret.value = true;
-    })
-  }
+  //   await fetch(
+  //     `${config.apiBaseUrl}/corporations/${route.params.id}/`,
+  //     {
+  //       headers: [['Corporation-Secret', getCorporationSecret(corporationId)]],
+  //     }
+  //   ).then((response) => {
+  //     if (response.ok) {
+  //       return response.json()
+  //     }
+  //     return Promise.reject(response);
+  //   }).then((responseJson) => {
+  //     setCorporationDetails(responseJson as CorporationDetails)
+  //     isLoading.value = false;
+  //     incorrectSecret.value = false;
+  //   }).catch((error) => {
+  //     useToast().error(`${error.status} - ${error.statusText}`)
+  //     isLoading.value = false;
+  //     incorrectSecret.value = true;
+  //   })
+  // }
 
   async function setAttributeLevel(attribute: Attribute, level:Number) {
       if (sendRequest.value) {
@@ -112,12 +114,12 @@
     return currentValue === attributeValue ? '' : 'transparent'
   }
 
-  fetchCorporationData();
+  
 </script>
 
 <template>
   <div>
-    <div v-if="isLoading">
+    <div v-if="loadingCorporation">
       <UiCard>
         Fetching data...
       </UiCard>
@@ -127,7 +129,7 @@
         <CorporationsSecret
           :goBackBtn="true"
           :corporationId="route.params.id.toString()"
-          @corporation-secret-change="fetchCorporationData()"
+          @corporation-secret-change="fetchCorporationData(corporationId)"
         />
       </div>
       <div v-else>
@@ -403,7 +405,7 @@
           <UiButton 
             :text="'Refresh'"
             class="ml-2"
-            @click="fetchCorporationData()"
+            @click="fetchCorporationData(corporationId)"
           />
           <UiButton 
             :text="'Go back'"
