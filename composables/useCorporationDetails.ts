@@ -2,6 +2,8 @@ import { CorporationDetails } from '@/types/corporation';
 import { Member } from '@/types/member';
 import { Condition } from '@/types/filter';
 import { ShipAttribute } from '@/types/ship-attribute';
+import * as pkg from "vue-toastification"
+const { useToast } = pkg
 
 function attributeGroup(filterId: string): keyof ShipAttribute {
   const weaponIds = ['BATTERY', 'LASER', 'MASS_BATTERY', 'DUAL_LASER', 'BARRAGE', 'DART_LAUNCHER'];
@@ -25,35 +27,42 @@ function attributeGroup(filterId: string): keyof ShipAttribute {
   return strKeyName
 }
 
-// async function fetchCorporationDataFromServer(corporationId: string, corporationSecret: string) {
-//   console.log('!!! fetch corp data from server')
-//   await fetch(
-//     `${config.apiBaseUrl}/corporations/${corporationId}/`,
-//     {
-//       headers: [['Corporation-Secret', corporationSecret]],
-//     }
-//   ).then((response) => {
-//     if (response.ok) {
-//       return response.json()
-//     }
-//     return Promise.reject(response);
-//   }).then((responseJson) => {
-//     return responseJson as CorporationDetails
-//     // setCorporationDetails(responseJson as CorporationDetails)
-//     // isLoading.value = false;
-//     // incorrectSecret.value = false;
-//   }).catch((error) => {
-//     return error
-//     // useToast().error(`${error.status} - ${error.statusText}`)
-//     // isLoading.value = false;
-//     // incorrectSecret.value = true;
-//   })
-// }
+function setCorporationLocalStorage(corporationId: string, corporationData: any = {} ): void {
+  if (process.client) {
+    if (!localStorage.getItem('hadesWS')) {
+      // Create base object if not exists
+      localStorage.setItem('hadesWS', JSON.stringify({appSettings: {}, corporations: {}}))
+    }
+    const lStorage = localStorage.getItem('hadesWS');
 
+    if (lStorage) {
+      let lStorageJson = JSON.parse(lStorage);
+      
+      // Add or update corporation to local storage object
+      lStorageJson.corporations[corporationId] = corporationData
+      
+      localStorage.setItem('hadesWS', JSON.stringify(lStorageJson))
+    }
+  }
+}
+
+function getCorporationLocalStorageData(id: string): any | null {
+  if (process.client) {
+    const lStorage = localStorage.getItem('hadesWS');
+    if (lStorage) {
+      const lStorageJson = JSON.parse(lStorage);
+      if (lStorageJson.corporations.hasOwnProperty(id)) {
+        return lStorageJson.corporations[id]
+      }
+    }
+  }
+  return null
+}
 
 const useCorporationDetails = () => {
-  const corporation = useState<CorporationDetails | null>('corporation')
-  const loadingCorporation = useState<boolean>('loadingCorporation', () => true)
+  const corporation = useState<CorporationDetails | null>('corporation');
+  const loadingCorporation = useState<boolean>('loadingCorporation', () => true);
+  const incorrectSecret = useState<boolean>('incorrectSecret', () => false);
 
   const fetchCorporationData = async (corporationId: string) => {
     const config = useRuntimeConfig();
@@ -72,13 +81,14 @@ const useCorporationDetails = () => {
       return Promise.reject(response);
     }).then((responseJson) => {
       setCorporationDetails(responseJson as CorporationDetails)
-      loadingCorporation.value = false
-      // isLoading.value = false;
-      // incorrectSecret.value = false;
+      loadingCorporation.value = false;
+      incorrectSecret.value = false;
     }).catch((error) => {
-      // useToast().error(`${error.status} - ${error.statusText}`)
-      // isLoading.value = false;
-      // incorrectSecret.value = true;
+      useToast().error(`${error.status} - ${error.statusText}`)
+      loadingCorporation.value = false;
+      if (error.status === 403) {
+        incorrectSecret.value = true;
+      }
     })
   }
 
@@ -108,19 +118,26 @@ const useCorporationDetails = () => {
     }
   }
 
-  const getCorporationSecret = (corporationId: string):string => {
-    let corporationSecret = '';
-    if (process.client) {
-      corporationSecret = localStorage.getItem(corporationId) || '';
-      if (corporationSecret !== '') {
-        corporationSecret = JSON.parse(corporationSecret).secret || '';
-      }
+  const getCorporationSecret = (corporationId: string): string => {
+    const corpData = getCorporationLocalStorageData(corporationId)
+    if (corpData && corpData.hasOwnProperty('secret')) {
+      return corpData.secret;
+    } else {
+      return '';
     }
-    return corporationSecret;
   }
 
-  const setCorporationSecret = (secret: String, corporationId: String) => {
-    localStorage.setItem(corporationId.toString(), JSON.stringify({secret: secret}))
+  const setCorporationSecret = (secret: string, corporationId: string) => {
+    let corpData = getCorporationLocalStorageData(corporationId)
+    if (!corpData) {
+      setCorporationLocalStorage(corporationId, {secret: secret})
+    } else {
+      corpData.secret = secret;
+      console.log(secret)
+      console.log(corpData)
+
+      setCorporationLocalStorage(corporationId, corpData)
+    }
   }
 
   const addCorporationMember = (member: Member) => {
@@ -168,7 +185,6 @@ const useCorporationDetails = () => {
       if (conditions.length > 0) {
         let filteredMembers: Member[] | undefined = []
         conditions.forEach(condition => {
-          console.log(condition)
           const attributeGroupName = attributeGroup(condition.id)
           if (condition.type === 'lower') {
             filteredMembers = corporation.value?.members.filter(
@@ -222,6 +238,7 @@ const useCorporationDetails = () => {
   return {
     corporation,
     loadingCorporation,
+    incorrectSecret,
     setCorporationDetails,
     setWsStatus,
     getWsStatus,

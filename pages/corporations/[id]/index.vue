@@ -9,7 +9,7 @@
   const route = useRoute();
   const config = useRuntimeConfig();
   const sendRequest = ref(false);
-  const incorrectSecret = ref(false);
+  // const incorrectSecret = ref(false);
   const editMember = ref(false);
   const clickedMember = ref<Member | null>();
   const clickedAttribute = ref<Attribute | null>();
@@ -20,37 +20,12 @@
   const editCorporationPopup = ref(false);
   const detailsVisible = ref(false);
   
-  const { corporation, loadingCorporation, getCorporationSecret, fetchCorporationData, setCorporationDetails } = useCorporationDetails();
+  const { corporation, loadingCorporation, incorrectSecret, getCorporationSecret, fetchCorporationData } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   const corporationId: string = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
   fetchCorporationData(corporationId);
-
-
-  // async function fetchCorporationDataI() {
-  //   corporation.value = null;
-    
-  //   await fetch(
-  //     `${config.apiBaseUrl}/corporations/${route.params.id}/`,
-  //     {
-  //       headers: [['Corporation-Secret', getCorporationSecret(corporationId)]],
-  //     }
-  //   ).then((response) => {
-  //     if (response.ok) {
-  //       return response.json()
-  //     }
-  //     return Promise.reject(response);
-  //   }).then((responseJson) => {
-  //     setCorporationDetails(responseJson as CorporationDetails)
-  //     isLoading.value = false;
-  //     incorrectSecret.value = false;
-  //   }).catch((error) => {
-  //     useToast().error(`${error.status} - ${error.statusText}`)
-  //     isLoading.value = false;
-  //     incorrectSecret.value = true;
-  //   })
-  // }
-
+  
   async function setAttributeLevel(attribute: Attribute, level:Number) {
       if (sendRequest.value) {
         return
