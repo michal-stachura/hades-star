@@ -63,6 +63,7 @@ const useCorporationDetails = () => {
   const corporation = useState<CorporationDetails | null>('corporation');
   const loadingCorporation = useState<boolean>('loadingCorporation', () => true);
   const incorrectSecret = useState<boolean>('incorrectSecret', () => false);
+  const currentCorporationId = useState<string>('currentCorporationId', () => '');
 
   const fetchCorporationData = async (corporationId: string) => {
     const config = useRuntimeConfig();
@@ -133,9 +134,6 @@ const useCorporationDetails = () => {
       setCorporationLocalStorage(corporationId, {secret: secret})
     } else {
       corpData.secret = secret;
-      console.log(secret)
-      console.log(corpData)
-
       setCorporationLocalStorage(corporationId, corpData)
     }
   }
@@ -239,6 +237,7 @@ const useCorporationDetails = () => {
     corporation,
     loadingCorporation,
     incorrectSecret,
+    currentCorporationId,
     setCorporationDetails,
     setWsStatus,
     getWsStatus,

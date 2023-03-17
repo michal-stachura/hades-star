@@ -52,14 +52,11 @@
           @click="toggleFilter(filter.id)"
         />
     </span>
-      <NuxtLink 
-        :to="`/corporations/${route.params.id}/filters`"
-      >
-        <UiButton
-          :text="'Manage filters'"
-          :size="'sm'"
-        />
-      </NuxtLink>
+      <UiButton
+        :text="'Manage filters'"
+        :size="'sm'"
+        @click="navigateTo(`/corporations/${route.params.id}/filters`)"
+      />
     </UiCard>
   </div>
 </template>

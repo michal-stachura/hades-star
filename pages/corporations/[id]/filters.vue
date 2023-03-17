@@ -1,17 +1,13 @@
 <script setup lang="ts">
-  import { CorporationDetails } from '@/types/corporation';
-  import * as pkg from "vue-toastification"
-  const { useToast } = pkg
-
   const route = useRoute();
   const config = useRuntimeConfig();
-  const { corporation, fetchCorporationData, getCorporationSecret, setCorporationDetails } = useCorporationDetails();
+  const { corporation, currentCorporationId, fetchCorporationData } = useCorporationDetails();
 
   const addFilter = ref(true);
   const corporationId: string = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
 
-  fetchCorporationData(corporationId);
+  fetchCorporationData(currentCorporationId.value);
 
 </script>
 
@@ -48,8 +44,5 @@
         @click="addFilter = true"
       />
     </UiFooter>
-  </div>
-  <div v-else>
-    Fetching data...
   </div>
 </template>

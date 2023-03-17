@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { CorporationDetails } from '@/types/corporation';
   import { Member } from '@/types/member';
   import { Attribute } from '@/types/ship-attribute';
   import * as pkg from "vue-toastification"
@@ -9,7 +8,6 @@
   const route = useRoute();
   const config = useRuntimeConfig();
   const sendRequest = ref(false);
-  // const incorrectSecret = ref(false);
   const editMember = ref(false);
   const clickedMember = ref<Member | null>();
   const clickedAttribute = ref<Attribute | null>();
@@ -20,11 +18,11 @@
   const editCorporationPopup = ref(false);
   const detailsVisible = ref(false);
   
-  const { corporation, loadingCorporation, incorrectSecret, getCorporationSecret, fetchCorporationData } = useCorporationDetails();
+  const { corporation, currentCorporationId, loadingCorporation, getCorporationSecret, fetchCorporationData } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
-  const corporationId: string = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
+  currentCorporationId.value = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
-  fetchCorporationData(corporationId);
+  fetchCorporationData(currentCorporationId.value);
   
   async function setAttributeLevel(attribute: Attribute, level:Number) {
       if (sendRequest.value) {
@@ -40,10 +38,10 @@
             attributeId: attribute.id,
             value: level,
             attributeName: attribute.name,
-            corporationId: route.params.id,
+            currentCorporationId: currentCorporationId.value,
           },
           headers: [
-            ['Corporation-Secret', getCorporationSecret(corporationId)]
+            ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
           ],
         }
       );
@@ -100,14 +98,7 @@
       </UiCard>
     </div>
     <div v-else>
-      <div v-if="incorrectSecret">
-        <CorporationsSecret
-          :goBackBtn="true"
-          :corporationId="route.params.id.toString()"
-          @corporation-secret-change="fetchCorporationData(corporationId)"
-        />
-      </div>
-      <div v-else>
+      <div>
         <div v-if="corporation">
           <div class="flex">
             <div class="grow">
@@ -177,7 +168,7 @@
                 <CorporationsNextWs
                   v-if="member.isVisible"
                   :member="member"
-                  :corporationId="corporationId"
+                  :corporationId="currentCorporationId"
                   :key="`nextWS_${member.id}`"
                 />
               </span>
@@ -373,21 +364,6 @@
             />
           </UiFooter>
         </div>
-        <div v-else>
-          <UiCard>
-            Error fetching data. Please try again.
-          </UiCard>
-          <UiButton 
-            :text="'Refresh'"
-            class="ml-2"
-            @click="fetchCorporationData(corporationId)"
-          />
-          <UiButton 
-            :text="'Go back'"
-            class="ml-2"
-            @click="navigateTo('/corporations')"
-          />
-        </div>
       </div>
     </div>
 
@@ -398,7 +374,7 @@
         >
           <div class="p-4">
             <CorporationsEdit
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               @close-popup="hideAllPopups();"
             />
           </div>
@@ -412,7 +388,7 @@
           @close-popup="hideAllPopups()"
         >
           <MembersAdd
-            :corporationId="corporationId"
+            :corporationId.value="currentCorporationId"
             @cancel-add-member="hideAllPopups();"
             @sucess-add-member="hideAllPopups();"
           />
@@ -427,7 +403,7 @@
         >
           <div class="p-4">
             <CorporationsSecret
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               :goBackBtn="false"
               :cancelBtn="true"
               :setNewSecret="true"
@@ -447,7 +423,7 @@
           <div v-if="!editMember" class="p-4">
             <MembersDetails
               :member="clickedMember"
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               @edit-member="editMember = true"
               @success-delete-member="hideAllPopups();"
             />
@@ -458,7 +434,7 @@
           >
             <MembersEdit
               :member="clickedMember"
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               @cancel-edit-member="hideAllPopups();"
               @success-edit-member="hideAllPopups();"
             />
