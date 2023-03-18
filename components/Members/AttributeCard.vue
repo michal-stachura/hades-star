@@ -31,7 +31,7 @@
 
 <template>
   <UiCard
-    class="mr-1"
+    class="mr-1 mb-1"
     :class="{
       'bg-orange-200/30': attribute.value === attribute.max && !iconsOnly,
       'opacity-60': attribute.value === 0 && !iconsOnly

@@ -148,7 +148,7 @@
                 <UiCard
                   v-if="member.isVisible"
                   @click="showMemberDetails(member)"
-                  class="cursor-pointer"
+                  class="cursor-pointer mb-1"
                   v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
                 >
                   {{ member.name }}
