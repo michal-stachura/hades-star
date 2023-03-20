@@ -38,7 +38,7 @@
             attributeId: attribute.id,
             value: level,
             attributeName: attribute.name,
-            currentCorporationId: currentCorporationId.value,
+            corporation_id: currentCorporationId.value,
           },
           headers: [
             ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
