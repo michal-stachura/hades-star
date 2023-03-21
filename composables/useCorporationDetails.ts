@@ -85,7 +85,9 @@ const useCorporationDetails = () => {
       loadingCorporation.value = false;
       incorrectSecret.value = false;
     }).catch((error) => {
-      useToast().error(`${error.status} - ${error.statusText}`)
+      if (process.client) {
+        useToast().error(`${error.status} - ${error.statusText}`)
+      }
       loadingCorporation.value = false;
       if (error.status === 403) {
         incorrectSecret.value = true;

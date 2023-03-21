@@ -1,8 +1,9 @@
 <script setup lang="ts">
   import { computed } from 'vue';
   import { Filter } from '@/types/filter';
-  import * as pkg from "vue-toastification"
-  const { useToast } = pkg
+  import * as pkg from "vue-toastification";
+  const { useToast } = pkg;
+
   const route = useRoute();
   const config = useRuntimeConfig();
   const { corporation, currentCorporationId, fetchCorporationData, getCorporationSecret, deleteCorporationFilter } = useCorporationDetails();
