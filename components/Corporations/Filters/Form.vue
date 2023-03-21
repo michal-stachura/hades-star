@@ -5,10 +5,9 @@
     type: String
   }
 
-
   const config = useRuntimeConfig();
   const toast = useToast();
-  const { getMemberShipAttributes } = useShipAttributes();
+  const emit = defineEmits(['cancelForm']);
   const { corporation, getCorporationSecret } = useCorporationDetails();
 
   const formStep = ref(1)
@@ -52,13 +51,13 @@
   }
 
   function setAttributeValue(attribute: filterAttributeType, value: number) {
-    if (attribute.value + value >= 0 && attribute.value + value <= attribute.max) {
-        attribute.value += value;
-        if (attribute.value === attribute.max) {
-          toast.info(`${attribute.value} is maximum for ${attribute.name}`);
+    if (attribute.set + value >= 0 && attribute.set + value <= attribute.max) {
+        attribute.set += value;
+        if (attribute.set === attribute.max) {
+          toast.info(`${attribute.set} is maximum for ${attribute.name}`);
         }
-      } else if (attribute.value + value < 0) {
-        attribute.value = 0;
+      } else if (attribute.set + value < 0) {
+        attribute.set = 0;
       }
       setFormProgress()
   }
@@ -77,7 +76,7 @@
     if (selectedAttributes.value.length > 0) {
       const progressLeft = 100 - progress
       const attributesWitoutZero = selectedAttributes.value.filter((attribute) => {
-        return attribute.value !== 0
+        return attribute.set !== 0
       })
       const progressToAdd = (attributesWitoutZero.length * 100) / selectedAttributes.value.length
       progress += (progressToAdd / 2)
@@ -227,6 +226,11 @@
 
         <UiButton
           class="mr-2 mb-2"
+          :text="'Cancel'"
+          @click="emit('cancelForm')"
+        />
+        <UiButton
+          class="mr-2 mb-2"
           :text="'Next'"
           :disabled="selectedAttributesId.length === 0 && filterForm.name === '' ? true : false"
           @click="goToStep2()"
@@ -258,7 +262,7 @@
                   <UiCard
                     :class="'rounded-full w-20 h-20 flex items-center justify-center'"
                   >
-                    <UiHeaderH1 :class="'mt-4 mx-4'">{{ attribute.value }}</UiHeaderH1>
+                    <UiHeaderH1 :class="'mt-4 mx-4'">{{ attribute.set }}</UiHeaderH1>
                   </UiCard>
                 </div>
                 <div class="flex items-center">
@@ -300,6 +304,11 @@
           class="mr-2 mb-2"
           :text="'Prev'"
           @click="formStep = 1; selectedAttributes = []; setFormProgress()"
+        />
+        <UiButton
+          class="mr-2 mb-2"
+          :text="'Cancel'"
+          @click="emit('cancelForm')"
         />
         <UiButton
           class="mr-2 mb-2"

@@ -48,7 +48,7 @@
       emit('closePopup');
     }
     
-    if (error.value) {
+    if (error.value && error.value.response) {
       useToast().error(`${error.value.response.status} - ${error.value.data.detail}`)
     }
     

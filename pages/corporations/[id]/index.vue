@@ -3,7 +3,7 @@
   import { Attribute } from '@/types/ship-attribute';
   import * as pkg from "vue-toastification"
   const { useToast } = pkg
-
+  
 
   const route = useRoute();
   const config = useRuntimeConfig();
@@ -38,7 +38,7 @@
             attributeId: attribute.id,
             value: level,
             attributeName: attribute.name,
-            corporation_id: currentCorporationId.value,
+            corporationId: currentCorporationId.value,
           },
           headers: [
             ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]

@@ -1,7 +1,7 @@
 export interface Attribute {
   id: string,
   name: string,
-  value: number,
+  set: number,
   max: number
 }
 

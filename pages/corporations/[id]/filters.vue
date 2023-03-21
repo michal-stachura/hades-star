@@ -1,10 +1,15 @@
 <script setup lang="ts">
   import { computed } from 'vue';
+  import { Filter } from '@/types/filter';
+  import * as pkg from "vue-toastification"
+  const { useToast } = pkg
   const route = useRoute();
   const config = useRuntimeConfig();
-  const { corporation, currentCorporationId, fetchCorporationData } = useCorporationDetails();
+  const { corporation, currentCorporationId, fetchCorporationData, getCorporationSecret, deleteCorporationFilter } = useCorporationDetails();
 
   const addFilter = ref(false);
+  const filterToDelete = ref<Filter>();
+  const sendRequest = ref<boolean>(false);
   currentCorporationId.value = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
 
@@ -25,6 +30,40 @@
       }
     }
   })
+
+  async function deleteFilter(): Promise<void> {
+    if (sendRequest.value) return;
+    sendRequest.value = true;
+
+    if (filterToDelete.value) {
+      const { pending } = await useFetch(
+        `${config.apiBaseUrl}/corporations/${currentCorporationId.value}/delete-filter/`,
+        {
+          method: 'DELETE',
+          body: {
+            filterId: filterToDelete.value.id
+          },
+          headers: [
+            ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
+          ],
+
+          onResponse({ request, response, options }) {
+            if (response.status === 204 ) {
+              useToast().success('Filter deleted');
+              if (filterToDelete.value && filterToDelete.value.id) {
+                deleteCorporationFilter(filterToDelete.value.id);
+                filterToDelete.value = undefined;
+              }
+            } else {
+              useToast().error(`${response.status} - Error. Please try again later.`)
+            }
+          }
+        }
+      )
+      sendRequest.value = pending.value
+    }
+    
+  }
 </script>
 
 <template>
@@ -67,25 +106,52 @@
             <div class="p-1 font-bold">{{ condition.set }}</div>
           </div>
           <template #footer>
-            <UiButton
-              :text="'Edit'"
-              :layout="'transparent'"
-              :size="'sm'"
-              class="mr-2"
-            />
-            <UiButton
-              :text="'Delete'"
-              :layout="'transparent'"
-              :size="'sm'"
-              class="mr-2"
-            />
+            <span
+              v-if="filterToDelete !== filter"
+            >
+              <UiButton
+                :text="'Edit'"
+                :layout="'transparent'"
+                :size="'sm'"
+                class="mr-2"
+              />
+              <UiButton
+                :text="'Delete'"
+                :layout="'transparent'"
+                :size="'sm'"
+                class="mr-2"
+                @click="filterToDelete = filter"
+              />
+            </span>
+            <span
+              v-else-if="filterToDelete === filter"
+            >
+              <UiInfo>
+                This action is permanent. Are you sure?
+              </UiInfo>
+              <UiButton
+                :text="'No'"
+                :layout="'transparent'"
+                :size="'sm'"
+                class="mr-2"
+                @click="filterToDelete = undefined"
+              />
+              <UiButton
+                :text="'Yes I\'m sure'"
+                :layout="'transparent'"
+                :size="'sm'"
+                @click="deleteFilter()"
+              />
+            </span>
           </template>
         </UiCard>
       </div>
     </div>
     <div v-else>
       <UiCard>
-        <CorporationsFiltersForm />
+        <CorporationsFiltersForm
+          @cancel-form="addFilter = false"
+        />
       </UiCard>
     </div>
     

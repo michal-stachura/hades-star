@@ -164,6 +164,15 @@ const useCorporationDetails = () => {
     }
   }
 
+  const deleteCorporationFilter = (filterId: string) => {
+    if (corporation.value && corporation.value.filters) {
+      const filterIdx = corporation.value.filters.findIndex(obj => obj.id === filterId)
+      if (filterIdx > -1) {
+        corporation.value.filters.splice(filterIdx, 1);
+      }
+    }
+  }
+
   const hideMembersWithWsStatus = (wsStatuses: string[]) => {
     if (corporation.value?.members) {
       let afterFiltering = []
@@ -248,6 +257,7 @@ const useCorporationDetails = () => {
     updateCorporationMember,
     addCorporationMember,
     deleteCorporationMember,
+    deleteCorporationFilter,
     hideMembersWithWsStatus,
     filterMembersByTechLevel,
   }
