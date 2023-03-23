@@ -138,21 +138,33 @@
           />
         </div>
       </div>
-
       <UiDivider />
-      <UiInputText
-        v-model="filterForm.name"
-        :value="filterForm.name"
-        :name="'filterName'"
-        :label="'Filter name'"
-        :css-classes="'w-full lg:w-96'"
-        @input="setFormProgress"
-      />
+      
+      
       <div
         v-if="attributes && formStep === 1"
       >
-        <UiHeaderH2>Step 1</UiHeaderH2>
-        <UiParagraph>Choose ship attributes you want to filter. {{ selectedAttributesId.length }}</UiParagraph>
+      <UiHeaderH2>Step 1 of 2</UiHeaderH2>
+      <div class="grid grid-cols-2">
+        <div>
+          <UiInputText
+            v-model="filterForm.name"
+            :value="filterForm.name"
+            :name="'filterName'"
+            :label="'Filter name'"
+            :css-classes="'w-full lg:w-96'"
+            @input="setFormProgress"
+          />
+        </div>
+        <div>
+          <UiLabel :text="`Chosen criteria. ${ selectedAttributesId.length }`" />
+          <UiBadge 
+            v-for="filterId in selectedAttributesId"
+            :text="`${filterId}`" 
+          />
+        </div>
+      </div>
+
         <div>
           <UiHeaderH2>Weapons</UiHeaderH2>
           <UiCard
