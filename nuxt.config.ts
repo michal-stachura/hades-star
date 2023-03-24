@@ -16,4 +16,5 @@ export default defineNuxtConfig({
   app: {
     // pageTransition: { name: 'page', mode: 'out-in' },
   },
+  build: { transpile: ['@fortawesome/vue-fontawesome'], }
 })

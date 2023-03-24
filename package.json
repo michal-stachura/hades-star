@@ -16,10 +16,10 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-pro": "^6.2.1",
-    "@fortawesome/fontawesome-svg-core": "^6.2.1",
+    "@fortawesome/fontawesome-svg-core": "^6.3.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
-    "@fortawesome/pro-duotone-svg-icons": "^6.2.1",
-    "@fortawesome/vue-fontawesome": "^3.0.2",
+    "@fortawesome/pro-duotone-svg-icons": "^6.3.0",
+    "@fortawesome/vue-fontawesome": "^3.0.3",
     "floating-vue": "^2.0.0-beta.20",
     "vue-toastification": "^2.0.0-rc.5"
   }

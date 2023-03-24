@@ -51,6 +51,7 @@
       :text="label"
     />
     <input
+      ref="inputElement"
       :name="name"
       :value="value"
       :placeholder="placeholder"

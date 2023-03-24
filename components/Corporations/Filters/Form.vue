@@ -110,8 +110,6 @@
         toast.error(`${error.value.response.status} - ${error.value.data.detail}`)
       }
     }
-
-    
   }
 
 </script>
@@ -149,7 +147,9 @@
         <div>
           <UiInputText
             v-model="filterForm.name"
+            v-focus
             :value="filterForm.name"
+            :placeholder="'My awesome filter...'"
             :name="'filterName'"
             :label="'Filter name'"
             :css-classes="'w-full lg:w-96'"
@@ -163,6 +163,15 @@
             :text="`${filterId}`" 
           />
         </div>
+      </div>
+
+      <div class="mt-8">
+        <UiParagraph>
+          Choose category and select attributes you want to add to filter.
+        </UiParagraph>
+        <UiButton
+          :text="'aaa'"
+        />
       </div>
 
         <div>
