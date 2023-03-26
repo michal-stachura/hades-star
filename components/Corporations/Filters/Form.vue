@@ -16,6 +16,8 @@
 
   const selectedAttributesId = ref<String[]>([]);
   const selectedAttributes = ref<filterAttributeType[]>([]);
+  const clickedtAttributeGroup = ref<'weapon' | 'shield' | 'support' | 'mining' | 'trade'>('weapon');
+  
 
   const filterForm = reactive({
     name: '',
@@ -74,7 +76,6 @@
       progress += 25
     }
     if (selectedAttributes.value.length > 0) {
-      const progressLeft = 100 - progress
       const attributesWitoutZero = selectedAttributes.value.filter((attribute) => {
         return attribute.set !== 0
       })
@@ -115,147 +116,173 @@
 </script>
 
 <template>
-  <div
+  <UiCard
     v-if="corporation"
-  >
-    <form @submit.prevent="saveForm" :corporation-id="corporation.id">
-      <div class="flex">
-        <div class="grow">
-          <UiHeaderH1>Filter form</UiHeaderH1>
-          <UiParagraph>Welcome Commander.</UiParagraph>
+    :footer="true"
+    :header="true"
+  > 
+  <template #header>
+    <div class="flex">
+      <div class="grow">
+        <UiHeaderH1>Filter form</UiHeaderH1>
+        <UiParagraph>Welcome Commander.</UiParagraph>
           <UiParagraph>
             Here you can define or edit filter which will be helpful in your WhiteStar Campaigns.<br />All filters will be availiable to use by the rest of your Corporation members
           </UiParagraph>
-        </div>
-        <div class="grow-0">
-          <UiCircleProgress
-            :progress="formProgress"
-            :animation-duration="300"
-            :progress-thickness="5"
-            :progress-color="'text-gray-500'"
-          />
-        </div>
       </div>
-      <UiDivider />
-      
-      
+      <div class="grow-0">
+        <UiCircleProgress
+          :progress="formProgress"
+          :animation-duration="300"
+          :progress-thickness="5"
+          :progress-color="'text-gray-500'"
+        />
+      </div>
+    </div>
+  </template>
+
+    <form @submit.prevent="saveForm" :corporation-id="corporation.id">
       <div
         v-if="attributes && formStep === 1"
       >
-      <UiHeaderH2>Step 1 of 2</UiHeaderH2>
-      <div class="grid grid-cols-2">
-        <div>
-          <UiInputText
-            v-model="filterForm.name"
-            v-focus
-            :value="filterForm.name"
-            :placeholder="'My awesome filter...'"
-            :name="'filterName'"
-            :label="'Filter name'"
-            :css-classes="'w-full lg:w-96'"
-            @input="setFormProgress"
+        <UiHeaderH2>Step 1 of 2</UiHeaderH2>
+        <div class="grid grid-cols-2">
+          <div>
+            <UiInputText
+              v-model="filterForm.name"
+              v-focus
+              :value="filterForm.name"
+              :placeholder="'My awesome filter...'"
+              :name="'filterName'"
+              :label="'Filter name'"
+              :css-classes="'w-full lg:w-96'"
+              @input="setFormProgress"
+            />
+          </div>
+          <div>
+            <UiLabel :text="`Chosen criteria. ${ selectedAttributesId.length }`" />
+            <UiBadge 
+              v-for="filterId in selectedAttributesId"
+              :text="`${filterId}`" 
+            />
+          </div>
+        </div>
+
+        <div class="mt-8 mb-2">
+          <UiParagraph>
+            Choose category and select attributes you want to add to filter.
+          </UiParagraph>
+          <UiButton
+            :text="'Weapon'"
+            :size="'sm'"
+            :layout="clickedtAttributeGroup === 'weapon' ? '' : 'transparent'"
+            class="mr-1"
+            @click="clickedtAttributeGroup = 'weapon'"
+            />
+          <UiButton
+            :text="'Sheilds'"
+            :size="'sm'"
+            :layout="clickedtAttributeGroup === 'shield' ? '' : 'transparent'"
+            class="mr-1"
+            @click="clickedtAttributeGroup = 'shield'"
+          />
+          <UiButton
+            :text="'Support'"
+            :size="'sm'"
+            :layout="clickedtAttributeGroup === 'support' ? '' : 'transparent'"
+            class="mr-1"
+            @click="clickedtAttributeGroup = 'support'"
+          />
+          <UiButton
+            :text="'Mining'"
+            :size="'sm'"
+            :layout="clickedtAttributeGroup === 'mining' ? '' : 'transparent'"
+            class="mr-1"
+            @click="clickedtAttributeGroup = 'mining'"
+          />
+          <UiButton
+            :text="'Trade'"
+            :size="'sm'"
+            :layout="clickedtAttributeGroup === 'trade' ? '' : 'transparent'"
+            class="mr-1"
+            @click="clickedtAttributeGroup = 'trade'"
           />
         </div>
-        <div>
-          <UiLabel :text="`Chosen criteria. ${ selectedAttributesId.length }`" />
-          <UiBadge 
-            v-for="filterId in selectedAttributesId"
-            :text="`${filterId}`" 
-          />
-        </div>
-      </div>
-
-      <div class="mt-8">
-        <UiParagraph>
-          Choose category and select attributes you want to add to filter.
-        </UiParagraph>
-        <UiButton
-          :text="'aaa'"
-        />
-      </div>
-
-        <div>
-          <UiHeaderH2>Weapons</UiHeaderH2>
+        <div
+          v-if="clickedtAttributeGroup === 'weapon'"
+        >
           <UiCard
             :layout="'dark'"
           >
             <UiButton
               v-for="attribute in attributes.weapon"
-              class="mr-2 mb-2"
+              class="mr-1"
               :text="attribute.id"
               :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
               @click="toggleAttribute(attribute)"
             />
           </UiCard>
         </div>
-        <div>
-          <UiHeaderH2>Shields</UiHeaderH2>
+        <div
+          v-if="clickedtAttributeGroup === 'shield'"
+        >
           <UiCard
             :layout="'dark'"
           >
             <UiButton
               v-for="attribute in attributes.shield"
-              class="mr-2 mb-2"
+              class="mr-1"
               :text="attribute.id"
               :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
               @click="toggleAttribute(attribute)"
             />
           </UiCard>
         </div>
-        <div>
-          <UiHeaderH2>Support</UiHeaderH2>
+        <div
+          v-if="clickedtAttributeGroup === 'support'"
+        >
           <UiCard
             :layout="'dark'"
           >
             <UiButton
               v-for="attribute in attributes.support"
-              class="mr-2 mb-2"
+              class="mr-1"
               :text="attribute.id"
               :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
               @click="toggleAttribute(attribute)"
             />
           </UiCard>
         </div>
-        <div>
-          <UiHeaderH2>Mining</UiHeaderH2>
+        <div
+          v-if="clickedtAttributeGroup === 'mining'"
+        >
           <UiCard
             :layout="'dark'"
           >
           <UiButton
             v-for="attribute in attributes.mining"
-            class="mr-2 mb-2"
+            class="mr-1"
             :text="attribute.id"
             :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
             @click="toggleAttribute(attribute)"
           />
           </UiCard>
         </div>
-        <div>
-          <UiHeaderH2>Trade</UiHeaderH2>
+        <div
+          v-if="clickedtAttributeGroup === 'trade'"
+        >
           <UiCard
             :layout="'dark'"
           >
             <UiButton
               v-for="attribute in attributes.trade"
-              class="mr-2 mb-2"
+              class="mr-1"
               :text="attribute.id"
               :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
               @click="toggleAttribute(attribute)"
             />
           </UiCard>
         </div>
-
-        <UiButton
-          class="mr-2 mb-2"
-          :text="'Cancel'"
-          @click="emit('cancelForm')"
-        />
-        <UiButton
-          class="mr-2 mb-2"
-          :text="'Next'"
-          :disabled="selectedAttributesId.length === 0 && filterForm.name === '' ? true : false"
-          @click="goToStep2()"
-        />
       </div>
       <div
         v-if="attributes && formStep === 2"
@@ -322,21 +349,38 @@
 
         <UiDivider class="mt-8"/>
         <UiButton
-          class="mr-2 mb-2"
+          class="mr-1"
           :text="'Prev'"
           @click="formStep = 1; selectedAttributes = []; setFormProgress()"
         />
         <UiButton
-          class="mr-2 mb-2"
+          class="mr-1"
           :text="'Cancel'"
           @click="emit('cancelForm')"
         />
         <UiButton
-          class="mr-2 mb-2"
+          class="mr-1"
           :text="'Save'"
           @click="saveForm"
         />
       </div>
     </form>
-  </div>
+
+    <template #footer>
+      <UiButton
+      class="mr-1"
+        :text="'Cancel'"
+        :size="'sm'"
+        :layout="'transparent'"
+        @click="emit('cancelForm')"
+      />
+      <UiButton
+        :text="'Next'"
+        :size="'sm'"
+        :layout="'transparent'"
+        :disabled="selectedAttributesId.length === 0 && filterForm.name === '' ? true : false"
+        @click="goToStep2()"
+      />
+    </template>
+  </UiCard>
 </template>

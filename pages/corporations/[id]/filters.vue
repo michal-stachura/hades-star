@@ -149,11 +149,9 @@
       </div>
     </div>
     <div v-else>
-      <UiCard>
-        <CorporationsFiltersForm
-          @cancel-form="addFilter = false"
-        />
-      </UiCard>
+      <CorporationsFiltersForm
+        @cancel-form="addFilter = false"
+      />
     </div>
     
 
