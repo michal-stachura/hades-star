@@ -7,6 +7,7 @@
 
   const config = useRuntimeConfig();
   const toast = useToast();
+  const { $reslugify } = useNuxtApp();
   const emit = defineEmits(['cancelForm']);
   const { corporation, getCorporationSecret } = useCorporationDetails();
 
@@ -210,78 +211,69 @@
         </div>
         <div
           v-if="clickedtAttributeGroup === 'weapon'"
+          class="mt-4"
         >
-          <UiCard
-            :layout="'dark'"
-          >
-            <UiButton
-              v-for="attribute in attributes.weapon"
-              class="mr-1"
-              :text="attribute.id"
-              :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
-              @click="toggleAttribute(attribute)"
-            />
-          </UiCard>
+          <CorporationsFiltersAttributeButton
+            v-for="attribute in attributes.weapon"
+            class="mr-1 mb-1"
+            :text="attribute.id"
+            :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
+            :size="'sm'"
+            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
+            @click="toggleAttribute(attribute)"
+          />
         </div>
         <div
           v-if="clickedtAttributeGroup === 'shield'"
         >
-          <UiCard
-            :layout="'dark'"
-          >
-            <UiButton
-              v-for="attribute in attributes.shield"
-              class="mr-1"
-              :text="attribute.id"
-              :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
-              @click="toggleAttribute(attribute)"
-            />
-          </UiCard>
+          <CorporationsFiltersAttributeButton
+            v-for="attribute in attributes.shield"
+            class="mr-1"
+            :text="attribute.id"
+            :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
+            :size="'sm'"
+            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
+            @click="toggleAttribute(attribute)"
+          />
         </div>
         <div
           v-if="clickedtAttributeGroup === 'support'"
         >
-          <UiCard
-            :layout="'dark'"
-          >
-            <UiButton
-              v-for="attribute in attributes.support"
-              class="mr-1"
-              :text="attribute.id"
-              :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
-              @click="toggleAttribute(attribute)"
-            />
-          </UiCard>
+          <CorporationsFiltersAttributeButton
+            v-for="attribute in attributes.support"
+            class="mr-1 mb-1"
+            :text="attribute.id"
+            :size="'sm'"
+            :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
+            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
+            @click="toggleAttribute(attribute)"
+          />
         </div>
         <div
           v-if="clickedtAttributeGroup === 'mining'"
         >
-          <UiCard
-            :layout="'dark'"
-          >
-          <UiButton
+          <CorporationsFiltersAttributeButton
             v-for="attribute in attributes.mining"
-            class="mr-1"
+            class="mr-1 mb-1"
             :text="attribute.id"
             :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
+            :size="'sm'"
+            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
             @click="toggleAttribute(attribute)"
           />
-          </UiCard>
         </div>
         <div
           v-if="clickedtAttributeGroup === 'trade'"
         >
-          <UiCard
-            :layout="'dark'"
-          >
-            <UiButton
-              v-for="attribute in attributes.trade"
-              class="mr-1"
-              :text="attribute.id"
-              :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
-              @click="toggleAttribute(attribute)"
-            />
-          </UiCard>
+          <CorporationsFiltersAttributeButton
+            v-for="attribute in attributes.trade"
+            class="mr-1 mb-1"
+            :text="attribute.id"
+            :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
+            :size="'sm'"
+            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
+            @click="toggleAttribute(attribute)"
+          />
         </div>
       </div>
       <div
