@@ -1,6 +1,6 @@
 import { CorporationDetails } from '@/types/corporation';
 import { Member } from '@/types/member';
-import { Condition } from '@/types/filter';
+import { Condition, Filter } from '@/types/filter';
 import { ShipAttribute } from '@/types/ship-attribute';
 import * as pkg from "vue-toastification"
 const { useToast } = pkg
@@ -142,8 +142,7 @@ const useCorporationDetails = () => {
 
   const addCorporationMember = (member: Member) => {
     if (corporation.value && corporation.value.members) {
-      corporation.value.members.push(member)
-
+      corporation.value.members.push(member);
       sortMembersByName();
     }
   }
@@ -151,9 +150,8 @@ const useCorporationDetails = () => {
   
   const updateCorporationMember = (member: Member) => {
     if (corporation.value && corporation.value.members) {
-      const memberIdx = corporation.value.members.findIndex(obj => obj.id === member.id)
-
-      corporation.value.members[memberIdx] = member
+      const memberIdx = corporation.value.members.findIndex(obj => obj.id === member.id);
+      corporation.value.members[memberIdx] = member;
     }
   }
 
@@ -163,6 +161,13 @@ const useCorporationDetails = () => {
       if (memberIdx > -1) {
         corporation.value.members.splice(memberIdx, 1);
       }
+    }
+  }
+
+  const addCorporationFilter = (filter: Filter): void => {
+    if (corporation.value && corporation.value.filters) {
+      corporation.value.filters.push(filter);
+      sortFiltersByName();
     }
   }
 
@@ -198,19 +203,19 @@ const useCorporationDetails = () => {
           if (condition.type === 'lower') {
             filteredMembers = corporation.value?.members.filter(
               member => member.attributes[attributeGroupName].some(
-                attribute => attribute.name === condition.id && attribute.value <= condition.set
+                attribute => attribute.name === condition.id && attribute.set <= condition.set
               )
             )
           } else if (condition.type === 'bigger') {
             filteredMembers = corporation.value?.members.filter(
               member => member.attributes[attributeGroupName].some(
-                attribute => attribute.name === condition.id && attribute.value >= condition.set
+                attribute => attribute.name === condition.id && attribute.set >= condition.set
               )
             )
           } else if (condition.type === 'equal') {
             filteredMembers = corporation.value?.members.filter(
               member => member.attributes[attributeGroupName].some(
-                attribute => attribute.name === condition.id && attribute.value === condition.set
+                attribute => attribute.name === condition.id && attribute.set === condition.set
               )
             )
           }
@@ -243,6 +248,24 @@ const useCorporationDetails = () => {
       })
     }
   }
+  
+  const sortFiltersByName = () => {
+    if (corporation.value && corporation.value.filters) {
+      // sort by name
+      corporation.value.filters.sort((a, b) => {
+        const nameA = a.name.toLowerCase();
+        const nameB = b.name.toLowerCase();
+
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;  // equal names
+      })
+    }
+  }
 
   return {
     corporation,
@@ -262,6 +285,7 @@ const useCorporationDetails = () => {
     deleteCorporationFilter,
     hideMembersWithWsStatus,
     filterMembersByTechLevel,
+    addCorporationFilter
   }
 }
 

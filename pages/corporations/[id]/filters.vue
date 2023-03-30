@@ -8,7 +8,7 @@
   const config = useRuntimeConfig();
   const { corporation, currentCorporationId, fetchCorporationData, getCorporationSecret, deleteCorporationFilter } = useCorporationDetails();
 
-  const addFilter = ref(true);
+  const addFilter = ref(false);
   const filterToDelete = ref<Filter>();
   const sendRequest = ref<boolean>(false);
   currentCorporationId.value = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]

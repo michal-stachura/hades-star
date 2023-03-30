@@ -36,7 +36,7 @@
           method: 'PATCH',
           body: {
             attributeId: attribute.id,
-            value: level,
+            set: level,
             attributeName: attribute.name,
             corporationId: currentCorporationId.value,
           },
@@ -47,7 +47,7 @@
       );
       
       if (data.value) {
-        attribute.value = data.value.value
+        attribute.set = data.value.set
         clickedMember.value = undefined
         clickedAttribute.value = undefined
         popupToggleVisibility()
@@ -461,7 +461,7 @@
               <UiButton 
                 class="m-1"
                 :text="'0'"
-                :layout="attributeButtonLayout(0, clickedAttribute.value)"
+                :layout="attributeButtonLayout(0, clickedAttribute.set)"
                 @click="setAttributeLevel(clickedAttribute!,  0)"
               />
               <UiButton 
@@ -469,7 +469,7 @@
                 class="m-1"
                 :key="idx"
                 :text="`${idx}`"
-                :layout="attributeButtonLayout(idx, clickedAttribute.value)"
+                :layout="attributeButtonLayout(idx, clickedAttribute.set)"
                 @click="setAttributeLevel(clickedAttribute!,  idx)"
               />
             </div>

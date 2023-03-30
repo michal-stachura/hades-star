@@ -7,9 +7,8 @@
 
   const config = useRuntimeConfig();
   const toast = useToast();
-  const { $reslugify } = useNuxtApp();
   const emit = defineEmits(['cancelForm']);
-  const { corporation, getCorporationSecret } = useCorporationDetails();
+  const { corporation, getCorporationSecret, addCorporationFilter } = useCorporationDetails();
 
   const formStep = ref(1)
   const formProgress = ref<number>(0)
@@ -89,8 +88,7 @@
 
   async function saveForm() {
     if (!submitAllowed.value) {
-      toast.error("Please fill all values in selected attributes")
-      return
+      toast.error("Please fill all values in selected attributes");
     }
 
     if (corporation.value) {
@@ -107,6 +105,9 @@
       
       if (data.value) {
         toast.success('Filter added successfully.');
+        formStep.value = 1;
+        addCorporationFilter(data.value);
+        emit('cancelForm');
       }
       if (error.value && error.value.response) {
         toast.error(`${error.value.response.status} - ${error.value.data.detail}`)
@@ -337,42 +338,41 @@
             </UiCard>
           </div>
         </div>
-        
-
-        <UiDivider class="mt-8"/>
-        <UiButton
-          class="mr-1"
-          :text="'Prev'"
-          @click="formStep = 1; selectedAttributes = []; setFormProgress()"
-        />
-        <UiButton
-          class="mr-1"
-          :text="'Cancel'"
-          @click="emit('cancelForm')"
-        />
-        <UiButton
-          class="mr-1"
-          :text="'Save'"
-          @click="saveForm"
-        />
       </div>
     </form>
 
     <template #footer>
       <UiButton
-      class="mr-1"
+        v-if="formStep === 2"
+        class="mr-1"
+        :text="'Prev'"
+        :size="'sm'"
+        :layout="'transparent'"
+        @click="formStep = 1; selectedAttributes = []; setFormProgress()"
+        />
+        <UiButton
+        class="mr-1"
         :text="'Cancel'"
         :size="'sm'"
         :layout="'transparent'"
         @click="emit('cancelForm')"
-      />
-      <UiButton
-        :text="'Next'"
-        :size="'sm'"
-        :layout="'transparent'"
-        :disabled="selectedAttributesId.length === 0 && filterForm.name === '' ? true : false"
-        @click="goToStep2()"
-      />
+        />
+        <UiButton
+          v-if="formStep === 1"
+          :text="'Next'"
+          :size="'sm'"
+          :layout="'transparent'"
+          :disabled="formProgress < 50 ? true : false"
+          @click="goToStep2()"
+        />
+        <UiButton
+          v-if="formStep === 2"
+          class="mr-1"
+          :text="'Save'"
+          :size="'sm'"
+          :layout="'transparent'"
+          @click="saveForm"
+        />
     </template>
   </UiCard>
 </template>
