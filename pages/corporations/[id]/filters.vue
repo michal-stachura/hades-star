@@ -10,6 +10,7 @@
 
   const addFilter = ref(false);
   const filterToDelete = ref<Filter>();
+  const filterToEdit = ref<Filter>();
   const sendRequest = ref<boolean>(false);
   currentCorporationId.value = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
@@ -75,7 +76,7 @@
       {{ corporation.name }} Filters
     </UiHeaderH1>
     <div
-      v-if="!addFilter"
+      v-if="!filterToEdit"
       class="grid lg:grid-cols-4 gap-1"
     >
       <div
@@ -115,6 +116,7 @@
                 :layout="'transparent'"
                 :size="'sm'"
                 class="mr-2"
+                @click="filterToEdit = filter"
               />
               <UiButton
                 :text="'Delete'"
@@ -149,8 +151,9 @@
       </div>
     </div>
     <div v-else>
-      <CorporationsFiltersForm
-        @cancel-form="addFilter = false"
+      <CorporationsFiltersForm  
+        :filter="filterToEdit"
+        @cancel-form="filterToEdit = undefined"
       />
     </div>
     

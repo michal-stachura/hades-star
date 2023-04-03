@@ -170,6 +170,15 @@ const useCorporationDetails = () => {
       sortFiltersByName();
     }
   }
+  
+  const updateCorporationFilter = (filter: Filter): void => {
+    if (corporation.value && corporation.value.filters) {
+      const filterIdx = corporation.value.filters.findIndex(obj => obj.id === filter.id)
+      if (filterIdx > -1) {
+        corporation.value.filters[filterIdx] = filter;
+      }
+    }
+  }
 
   const deleteCorporationFilter = (filterId: string) => {
     if (corporation.value && corporation.value.filters) {
@@ -285,7 +294,8 @@ const useCorporationDetails = () => {
     deleteCorporationFilter,
     hideMembersWithWsStatus,
     filterMembersByTechLevel,
-    addCorporationFilter
+    addCorporationFilter,
+    updateCorporationFilter
   }
 }
 

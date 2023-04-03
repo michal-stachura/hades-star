@@ -1,26 +1,41 @@
 <script setup lang="ts">
-  import { ShipAttribute, Attribute } from "@/types/ship-attribute";
+  import { PropType, computed, Ref } from 'vue';
   import { useToast } from "vue-toastification";
+  import { ShipAttribute, Attribute } from "@/types/ship-attribute";
+  import { Filter } from '@/types/filter';
   type filterAttributeType = Attribute & {
     type: String
   }
 
+  const props = defineProps({
+    filter: {
+      type: Object as PropType<Filter>,
+      required: false,
+      default: undefined
+    }
+  })
+
   const config = useRuntimeConfig();
   const toast = useToast();
   const emit = defineEmits(['cancelForm']);
-  const { corporation, getCorporationSecret, addCorporationFilter } = useCorporationDetails();
+  const { corporation, getCorporationSecret, addCorporationFilter, updateCorporationFilter } = useCorporationDetails();
 
   const formStep = ref(1)
   const formProgress = ref<number>(0)
   const submitAllowed = ref<boolean>(false)
 
-  const selectedAttributesId = ref<String[]>([]);
+  const selectedAttributesId = ref<string[]>([])
   const selectedAttributes = ref<filterAttributeType[]>([]);
+  if (props.filter?.conditions) {
+    selectedAttributesId.value = props.filter.conditions.map(condition => condition.id)
+    selectedAttributes.value = props.filter.conditions
+  }
+  
   const clickedtAttributeGroup = ref<'weapon' | 'shield' | 'support' | 'mining' | 'trade'>('weapon');
   
-
   const filterForm = reactive({
-    name: '',
+    filterId: props.filter?.id ?? undefined,
+    name: props.filter?.name ?? '',
   });
 
 
@@ -43,11 +58,12 @@
       const shields = attributes.value.shield?.filter(attribute => selectedAttributesId.value.includes(attribute.id)) ?? [];
       const mining = attributes.value.mining?.filter(attribute => selectedAttributesId.value.includes(attribute.id)) ?? [];
       const trade = attributes.value.trade?.filter(attribute => selectedAttributesId.value.includes(attribute.id)) ?? [];
-
+      
       selectedAttributes.value = [...weapons,  ...support, ...shields, ...mining, ...trade].map(attribute => {
         return {...attribute, type: 'equal'}
       });
-
+      // TODO: fix selectedAttributes which are override by default value and `set` parameter is equeal to 0 on step 2 !!!
+      console.log(selectedAttributes.value)
     }
     formStep.value = 2;
   }
@@ -69,7 +85,7 @@
 
   function setFormProgress():void {
     let progress = 0;
-    if (filterForm.name.trim().length > 0) {
+    if (filterForm.name && filterForm.name.trim().length > 0) {
       progress += 25
     }
     if (selectedAttributesId.value.length > 0) {
@@ -92,10 +108,13 @@
     }
 
     if (corporation.value) {
+      const method = props.filter ? 'PATCH' : 'POST';
+      const url = props.filter ? `${config.apiBaseUrl}/corporations/${corporation.value.id}/edit-filter/` : `${config.apiBaseUrl}/corporations/${corporation.value.id}/add-filter/`
+
       const { data, error } = await useFetch(
-        `${config.apiBaseUrl}/corporations/${corporation.value.id}/add-filter/`,
+        url,
         {
-          method: 'POST',
+          method: method,
           body: {...filterForm, conditions: selectedAttributes.value},
           headers: [
             ['Corporation-Secret', getCorporationSecret(corporation.value.id)]
@@ -106,7 +125,11 @@
       if (data.value) {
         toast.success('Filter added successfully.');
         formStep.value = 1;
-        addCorporationFilter(data.value);
+        if (method === 'POST') {
+          addCorporationFilter(data.value as Filter);
+        } else if (method === 'PATCH') {
+          updateCorporationFilter(data.value as Filter);
+        }
         emit('cancelForm');
       }
       if (error.value && error.value.response) {
@@ -114,7 +137,7 @@
       }
     }
   }
-
+  setFormProgress();
 </script>
 
 <template>
