@@ -8,8 +8,8 @@ export interface Condition {
 
 export interface Filter {
   id: string;
-  name: String;
-  corporation: String;
-  createdBy: String;
+  name: string;
+  corporation: string;
+  createdBy: string;
   conditions: Condition[];
 }

@@ -1,17 +1,19 @@
 <script setup lang="ts">
-  import { PropType, computed, Ref } from 'vue';
+  import { PropType } from 'vue';
   import { useToast } from "vue-toastification";
   import { ShipAttribute, Attribute } from "@/types/ship-attribute";
   import { Filter } from '@/types/filter';
-  type filterAttributeType = Attribute & {
-    type: String
-  }
 
   const props = defineProps({
     filter: {
       type: Object as PropType<Filter>,
       required: false,
       default: undefined
+    },
+    editForm: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   })
 
@@ -24,51 +26,33 @@
   const formProgress = ref<number>(0)
   const submitAllowed = ref<boolean>(false)
 
-  const selectedAttributesId = ref<string[]>([])
-  const selectedAttributes = ref<filterAttributeType[]>([]);
+  const selectedAttributes = ref<Attribute[]>([]);
   if (props.filter?.conditions) {
-    selectedAttributesId.value = props.filter.conditions.map(condition => condition.id)
     selectedAttributes.value = props.filter.conditions
   }
   
   const clickedtAttributeGroup = ref<'weapon' | 'shield' | 'support' | 'mining' | 'trade'>('weapon');
+  const attributeGroups: Array<typeof clickedtAttributeGroup.value> = ['weapon', 'shield', 'support', 'mining', 'trade'];
   
   const filterForm = reactive({
     filterId: props.filter?.id ?? undefined,
-    name: props.filter?.name ?? '',
+    name: props.filter?.name || '',
   });
 
 
   const { data: attributes } = await useFetch<ShipAttribute>(`${config.apiBaseUrl}/utils/ship-attributes/`);
+  
 
   function toggleAttribute(attribute: Attribute) {
-    if (selectedAttributesId.value.includes(attribute.id)) {
-      selectedAttributesId.value.splice(selectedAttributesId.value.indexOf(attribute.id), 1)
+    if (selectedAttributes.value.includes(attribute)) {
+      selectedAttributes.value.splice(selectedAttributes.value.indexOf(attribute), 1)
     } else {
-      selectedAttributesId.value.push(attribute.id)
+      selectedAttributes.value.push(attribute)
     }
     setFormProgress()
   }
 
-
-  function goToStep2(){
-    if (attributes.value) {
-      const weapons = attributes.value.weapon?.filter(attribute => selectedAttributesId.value.includes(attribute.id)) ?? [];
-      const support = attributes.value.support?.filter(attribute => selectedAttributesId.value.includes(attribute.id)) ?? [];
-      const shields = attributes.value.shield?.filter(attribute => selectedAttributesId.value.includes(attribute.id)) ?? [];
-      const mining = attributes.value.mining?.filter(attribute => selectedAttributesId.value.includes(attribute.id)) ?? [];
-      const trade = attributes.value.trade?.filter(attribute => selectedAttributesId.value.includes(attribute.id)) ?? [];
-      
-      selectedAttributes.value = [...weapons,  ...support, ...shields, ...mining, ...trade].map(attribute => {
-        return {...attribute, type: 'equal'}
-      });
-      // TODO: fix selectedAttributes which are override by default value and `set` parameter is equeal to 0 on step 2 !!!
-      console.log(selectedAttributes.value)
-    }
-    formStep.value = 2;
-  }
-
-  function setAttributeValue(attribute: filterAttributeType, value: number) {
+  function setAttributeValue(attribute: Attribute, value: number) {
     if (attribute.set + value >= 0 && attribute.set + value <= attribute.max) {
         attribute.set += value;
         if (attribute.set === attribute.max) {
@@ -79,7 +63,7 @@
       }
       setFormProgress()
   }
-  function setAttributeValueType(attribute: filterAttributeType, type: string) {
+  function setAttributeValueType(attribute: Attribute, type: string) {
     attribute.type = type;
   }
 
@@ -88,7 +72,7 @@
     if (filterForm.name && filterForm.name.trim().length > 0) {
       progress += 25
     }
-    if (selectedAttributesId.value.length > 0) {
+    if (selectedAttributes.value.length > 0) {
       progress += 25
     }
     if (selectedAttributes.value.length > 0) {
@@ -137,6 +121,11 @@
       }
     }
   }
+
+  function isSelectedAttribute (attribute: Attribute): boolean {
+    return selectedAttributes.value.some(selectedItem => selectedItem.id === attribute.id);
+  }
+
   setFormProgress();
 </script>
 
@@ -157,6 +146,7 @@
       </div>
       <div class="grow-0">
         <UiCircleProgress
+          v-if="!editForm"
           :progress="formProgress"
           :animation-duration="300"
           :progress-thickness="5"
@@ -185,10 +175,10 @@
             />
           </div>
           <div>
-            <UiLabel :text="`Chosen criteria. ${ selectedAttributesId.length }`" />
+            <UiLabel :text="`Chosen criteria. ${ selectedAttributes.length }`" />
             <UiBadge 
-              v-for="filterId in selectedAttributesId"
-              :text="`${filterId}`" 
+              v-for="filter in selectedAttributes"
+              :text="`${filter.id}`" 
             />
           </div>
         </div>
@@ -198,107 +188,32 @@
             Choose category and select attributes you want to add to filter.
           </UiParagraph>
           <UiButton
-            :text="'Weapon'"
+            v-for="attributeGroup in attributeGroups"
+            :text="attributeGroup"
             :size="'sm'"
-            :layout="clickedtAttributeGroup === 'weapon' ? '' : 'transparent'"
+            :layout="clickedtAttributeGroup === attributeGroup ? '' : 'transparent'"
             class="mr-1"
-            @click="clickedtAttributeGroup = 'weapon'"
+            @click="clickedtAttributeGroup = attributeGroup"
+          />
+        </div>
+        <template
+          v-for="attributeGroup in Object.keys(attributes)"
+        >
+          <div
+            v-if="clickedtAttributeGroup === attributeGroup"
+            class="mt-4"
+          >
+            <CorporationsFiltersAttributeButton
+              v-for="attribute in attributes[attributeGroup]"
+              class="mr-1 mb-1"
+              :text="attribute.id"
+              :layout="isSelectedAttribute(attribute) ? '' : 'transparent'"
+              :size="'sm'"
+              :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
+              @click="toggleAttribute(attribute)"
             />
-          <UiButton
-            :text="'Sheilds'"
-            :size="'sm'"
-            :layout="clickedtAttributeGroup === 'shield' ? '' : 'transparent'"
-            class="mr-1"
-            @click="clickedtAttributeGroup = 'shield'"
-          />
-          <UiButton
-            :text="'Support'"
-            :size="'sm'"
-            :layout="clickedtAttributeGroup === 'support' ? '' : 'transparent'"
-            class="mr-1"
-            @click="clickedtAttributeGroup = 'support'"
-          />
-          <UiButton
-            :text="'Mining'"
-            :size="'sm'"
-            :layout="clickedtAttributeGroup === 'mining' ? '' : 'transparent'"
-            class="mr-1"
-            @click="clickedtAttributeGroup = 'mining'"
-          />
-          <UiButton
-            :text="'Trade'"
-            :size="'sm'"
-            :layout="clickedtAttributeGroup === 'trade' ? '' : 'transparent'"
-            class="mr-1"
-            @click="clickedtAttributeGroup = 'trade'"
-          />
-        </div>
-        <div
-          v-if="clickedtAttributeGroup === 'weapon'"
-          class="mt-4"
-        >
-          <CorporationsFiltersAttributeButton
-            v-for="attribute in attributes.weapon"
-            class="mr-1 mb-1"
-            :text="attribute.id"
-            :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
-            :size="'sm'"
-            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
-            @click="toggleAttribute(attribute)"
-          />
-        </div>
-        <div
-          v-if="clickedtAttributeGroup === 'shield'"
-        >
-          <CorporationsFiltersAttributeButton
-            v-for="attribute in attributes.shield"
-            class="mr-1"
-            :text="attribute.id"
-            :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
-            :size="'sm'"
-            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
-            @click="toggleAttribute(attribute)"
-          />
-        </div>
-        <div
-          v-if="clickedtAttributeGroup === 'support'"
-        >
-          <CorporationsFiltersAttributeButton
-            v-for="attribute in attributes.support"
-            class="mr-1 mb-1"
-            :text="attribute.id"
-            :size="'sm'"
-            :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
-            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
-            @click="toggleAttribute(attribute)"
-          />
-        </div>
-        <div
-          v-if="clickedtAttributeGroup === 'mining'"
-        >
-          <CorporationsFiltersAttributeButton
-            v-for="attribute in attributes.mining"
-            class="mr-1 mb-1"
-            :text="attribute.id"
-            :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
-            :size="'sm'"
-            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
-            @click="toggleAttribute(attribute)"
-          />
-        </div>
-        <div
-          v-if="clickedtAttributeGroup === 'trade'"
-        >
-          <CorporationsFiltersAttributeButton
-            v-for="attribute in attributes.trade"
-            class="mr-1 mb-1"
-            :text="attribute.id"
-            :layout="selectedAttributesId.includes(attribute.id) ? '' : 'transparent'"
-            :size="'sm'"
-            :icon="`${config.imagesUrl}/images/${$slugify(attribute.id)}.png`"
-            @click="toggleAttribute(attribute)"
-          />
-        </div>
+          </div>
+        </template>
       </div>
       <div
         v-if="attributes && formStep === 2"
@@ -371,7 +286,7 @@
         :text="'Prev'"
         :size="'sm'"
         :layout="'transparent'"
-        @click="formStep = 1; selectedAttributes = []; setFormProgress()"
+        @click="formStep = 1"
         />
         <UiButton
         class="mr-1"
@@ -386,7 +301,7 @@
           :size="'sm'"
           :layout="'transparent'"
           :disabled="formProgress < 50 ? true : false"
-          @click="goToStep2()"
+          @click="formStep = 2"
         />
         <UiButton
           v-if="formStep === 2"

@@ -153,6 +153,7 @@
     <div v-else>
       <CorporationsFiltersForm  
         :filter="filterToEdit"
+        :editForm="true"
         @cancel-form="filterToEdit = undefined"
       />
     </div>
