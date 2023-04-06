@@ -44,10 +44,12 @@
   
 
   function toggleAttribute(attribute: Attribute) {
-    if (selectedAttributes.value.includes(attribute)) {
-      selectedAttributes.value.splice(selectedAttributes.value.indexOf(attribute), 1)
+    const idx = selectedAttributes.value.findIndex(attr => attr.id == attribute.id)
+    if (idx !== -1) {
+      selectedAttributes.value.splice(idx, 1)
     } else {
-      selectedAttributes.value.push(attribute)
+      attribute['type'] = 'equal';
+      selectedAttributes.value.push(attribute);
     }
     setFormProgress()
   }
@@ -268,7 +270,7 @@
                 @click="setAttributeValueType(attribute, 'lower')"
               />
               <UiButton
-                :text="'bigger or equal'"
+                :text="'greater or equal'"
                 :size="'sm'"
                 :layout="attribute.type === 'bigger' ? '': 'transparent'"
                 @click="setAttributeValueType(attribute, 'bigger')"
@@ -281,36 +283,36 @@
 
     <template #footer>
       <UiButton
-        v-if="formStep === 2"
-        class="mr-1"
-        :text="'Prev'"
-        :size="'sm'"
-        :layout="'transparent'"
-        @click="formStep = 1"
-        />
-        <UiButton
         class="mr-1"
         :text="'Cancel'"
         :size="'sm'"
         :layout="'transparent'"
         @click="emit('cancelForm')"
-        />
-        <UiButton
-          v-if="formStep === 1"
-          :text="'Next'"
-          :size="'sm'"
-          :layout="'transparent'"
-          :disabled="formProgress < 50 ? true : false"
-          @click="formStep = 2"
-        />
-        <UiButton
-          v-if="formStep === 2"
-          class="mr-1"
-          :text="'Save'"
-          :size="'sm'"
-          :layout="'transparent'"
-          @click="saveForm"
-        />
+      />
+      <UiButton
+        class="mr-1"
+        :text="'Prev'"
+        :size="'sm'"
+        :layout="'transparent'"
+        :disabled="formStep === 1"
+        @click="formStep = 1"
+      />
+      <UiButton
+        class="mr-1"
+        :text="'Next'"
+        :size="'sm'"
+        :layout="'transparent'"
+        :disabled="formStep === 2 || formProgress < 50"
+        @click="formStep = 2"
+      />
+      <UiButton
+        class="float-right"
+        :text="'Save'"
+        :size="'sm'"
+        :layout="'transparent'"
+        :disabled="formProgress !== 100"
+        @click="saveForm"
+      />
     </template>
   </UiCard>
 </template>

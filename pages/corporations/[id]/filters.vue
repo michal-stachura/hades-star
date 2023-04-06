@@ -76,7 +76,7 @@
       {{ corporation.name }} Filters
     </UiHeaderH1>
     <div
-      v-if="!filterToEdit"
+      v-if="!filterToEdit && !addFilter"
       class="grid lg:grid-cols-4 gap-1"
     >
       <div
@@ -150,11 +150,11 @@
         </UiCard>
       </div>
     </div>
-    <div v-else>
+    <div v-else="">
       <CorporationsFiltersForm  
         :filter="filterToEdit"
-        :editForm="true"
-        @cancel-form="filterToEdit = undefined"
+        :editForm="!!filterToEdit"
+        @cancel-form="filterToEdit = undefined; addFilter = false"
       />
     </div>
     
