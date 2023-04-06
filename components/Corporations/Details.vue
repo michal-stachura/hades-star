@@ -9,6 +9,7 @@
       type: Object as PropType<CorporationDetails>,
     }
   });
+  const emit = defineEmits(['HSync'])
   const { $clipboard } = useNuxtApp();
   const route = useRoute();
 
@@ -37,7 +38,10 @@
 
 <template>
   <div>
-    <UiCard>
+    <UiCard
+      class="mb-1"
+      :footer="true"
+    >
       <div>
         <UiLabel 
           :text="'Headquater ID'"
@@ -97,6 +101,14 @@
           <UiHeaderH1>{{ corporation.wsWins }}</UiHeaderH1>
         </div>
       </div>
+      <template #footer >
+        <UiButton
+          :text="'Sync data with HS Compendium'"
+          :layout="'transparent'"
+          :size="'sm'"
+          @click="emit('HSync')"
+        />
+      </template>
     </UiCard>
   </div>
 </template>

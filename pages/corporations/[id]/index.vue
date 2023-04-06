@@ -16,6 +16,7 @@
   const memberDetailsPopup = ref(false);
   const memberAttributePopup = ref(false);
   const editCorporationPopup = ref(false);
+  const hSyncPopup = ref(false);
   const detailsVisible = ref(false);
   
   const { corporation, currentCorporationId, loadingCorporation, getCorporationSecret, fetchCorporationData } = useCorporationDetails();
@@ -67,6 +68,7 @@
     memberDetailsPopup.value = false;
     memberAttributePopup.value = false;
     editCorporationPopup.value = false;
+    hSyncPopup.value = false;
     popupToggleVisibility();
   }
 
@@ -118,9 +120,10 @@
           </div>
           <UiDivider />
           <CorporationsDetails 
-            :corporation="corporation"
             class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
-            :class="{'max-h-[24rem]': detailsVisible}"
+            :class="{'max-h-[28rem]': detailsVisible}"
+            :corporation="corporation"
+            @h-sync="hSyncPopup = true; popupToggleVisibility();"
           />
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
             <div>
@@ -474,6 +477,21 @@
               />
             </div>
           </div>
+        </UiPopup>
+      </Teleport>
+    </ClientOnly>
+
+    <ClientOnly
+      v-if="isPopupVisible && hSyncPopup"
+    >
+      <Teleport to="#popup-container">
+        <UiPopup
+          :header="'HS Compendium Data Sync'"
+          @close-popup="hideAllPopups()"
+        >
+          <CorporationsHSync 
+            :corporationId.value="currentCorporationId"
+          />
         </UiPopup>
       </Teleport>
     </ClientOnly>
