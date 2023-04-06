@@ -1,5 +1,5 @@
 import { ShipAttribute } from '@/types/ship-attribute';
-import shipAttributesData from '@/data/shipAttributes';
+import shipAttributesData from '~~/data/_shipAttributes';
 
 
 const useShipAttributes = () => {

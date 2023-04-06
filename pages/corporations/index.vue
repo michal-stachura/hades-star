@@ -45,7 +45,7 @@
     </UiCard>
     <div
       v-if="!pending"
-      class="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-x-1 lg:grid-cols-3 xl:grid-cols-4"
+      class="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
     >
       <CorporationsBox 
         v-for="corporation in corporations"

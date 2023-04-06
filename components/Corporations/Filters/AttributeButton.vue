@@ -26,6 +26,11 @@
       type: Boolean,
       required: false,
       default: false
+    },
+    icon: {
+      type: String,
+      required: false,
+      default: null
     }
   })
   
@@ -60,10 +65,21 @@
   <button
     class="transition-all duration-300 hover:scale-105 disabled:hover:scale-100 disabled:opacity-80"
     :class="buttonLayout()"
-    :type="props.type"
+    :type="'button'"
     :disabled="props.disabled"
   >
-    {{ props.text }}
+    <div class="flex">
+      <div v-if="props.icon" class="inline-block border-r border-white/60 pr-2 mr-2">
+        <nuxt-img
+          :src="props.icon"
+          class="h-6"
+          loading="lazy"
+        />
+      </div>
+      <div>
+        {{ props.text }}
+      </div>
+    </div>
   </button>
 </template>
 

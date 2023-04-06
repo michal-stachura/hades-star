@@ -1,16 +1,13 @@
 <script setup lang="ts">
-  import { CorporationDetails } from '@/types/corporation';
   import { Member } from '@/types/member';
   import { Attribute } from '@/types/ship-attribute';
   import * as pkg from "vue-toastification"
   const { useToast } = pkg
-
+  
 
   const route = useRoute();
   const config = useRuntimeConfig();
-  const isLoading = ref(true);
   const sendRequest = ref(false);
-  const incorrectSecret = ref(false);
   const editMember = ref(false);
   const clickedMember = ref<Member | null>();
   const clickedAttribute = ref<Attribute | null>();
@@ -21,34 +18,12 @@
   const editCorporationPopup = ref(false);
   const detailsVisible = ref(false);
   
-  const { corporation, getCorporationSecret, setCorporationDetails } = useCorporationDetails();
+  const { corporation, currentCorporationId, loadingCorporation, getCorporationSecret, fetchCorporationData } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
-  const corporationId: string = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
+  currentCorporationId.value = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
-  async function fetchCorporationData() {
-    corporation.value = null;
-    
-    await fetch(
-      `${config.apiBaseUrl}/corporations/${route.params.id}/`,
-      {
-        headers: [['Corporation-Secret', getCorporationSecret(corporationId)]],
-      }
-    ).then((response) => {
-      if (response.ok) {
-        return response.json()
-      }
-      return Promise.reject(response);
-    }).then((responseJson) => {
-      setCorporationDetails(responseJson as CorporationDetails)
-      isLoading.value = false;
-      incorrectSecret.value = false;
-    }).catch((error) => {
-      useToast().error(`${error.status} - ${error.statusText}`)
-      isLoading.value = false;
-      incorrectSecret.value = true;
-    })
-  }
-
+  fetchCorporationData(currentCorporationId.value);
+  
   async function setAttributeLevel(attribute: Attribute, level:Number) {
       if (sendRequest.value) {
         return
@@ -61,18 +36,18 @@
           method: 'PATCH',
           body: {
             attributeId: attribute.id,
-            value: level,
+            set: level,
             attributeName: attribute.name,
-            corporationId: route.params.id,
+            corporationId: currentCorporationId.value,
           },
           headers: [
-            ['Corporation-Secret', getCorporationSecret(corporationId)]
+            ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
           ],
         }
       );
       
       if (data.value) {
-        attribute.value = data.value.value
+        attribute.set = data.value.set
         clickedMember.value = undefined
         clickedAttribute.value = undefined
         popupToggleVisibility()
@@ -112,25 +87,18 @@
     return currentValue === attributeValue ? '' : 'transparent'
   }
 
-  fetchCorporationData();
+  
 </script>
 
 <template>
   <div>
-    <div v-if="isLoading">
+    <div v-if="loadingCorporation">
       <UiCard>
         Fetching data...
       </UiCard>
     </div>
     <div v-else>
-      <div v-if="incorrectSecret">
-        <CorporationsSecret
-          :goBackBtn="true"
-          :corporationId="route.params.id.toString()"
-          @corporation-secret-change="fetchCorporationData()"
-        />
-      </div>
-      <div v-else>
+      <div>
         <div v-if="corporation">
           <div class="flex">
             <div class="grow">
@@ -154,9 +122,16 @@
             class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
             :class="{'max-h-[24rem]': detailsVisible}"
           />
-          <CorporationsNextWsStats 
-            :members="corporation.members"
-          />
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
+            <div>
+              <CorporationsNextWsStats 
+                :members="corporation.members"
+              />
+            </div>
+            <div>
+              <CorporationsFiltersCard />
+            </div>
+          </div>
           <div
             v-if="corporation.members && corporation.members.length > 0"
             class="flex mt-2">
@@ -173,7 +148,7 @@
                 <UiCard
                   v-if="member.isVisible"
                   @click="showMemberDetails(member)"
-                  class="cursor-pointer"
+                  class="cursor-pointer mb-1"
                   v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
                 >
                   {{ member.name }}
@@ -193,7 +168,7 @@
                 <CorporationsNextWs
                   v-if="member.isVisible"
                   :member="member"
-                  :corporationId="corporationId"
+                  :corporationId="currentCorporationId"
                   :key="`nextWS_${member.id}`"
                 />
               </span>
@@ -389,21 +364,6 @@
             />
           </UiFooter>
         </div>
-        <div v-else>
-          <UiCard>
-            Error fetching data. Please try again.
-          </UiCard>
-          <UiButton 
-            :text="'Refresh'"
-            class="ml-2"
-            @click="fetchCorporationData()"
-          />
-          <UiButton 
-            :text="'Go back'"
-            class="ml-2"
-            @click="navigateTo('/corporations')"
-          />
-        </div>
       </div>
     </div>
 
@@ -414,7 +374,7 @@
         >
           <div class="p-4">
             <CorporationsEdit
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               @close-popup="hideAllPopups();"
             />
           </div>
@@ -428,7 +388,7 @@
           @close-popup="hideAllPopups()"
         >
           <MembersAdd
-            :corporationId="corporationId"
+            :corporationId.value="currentCorporationId"
             @cancel-add-member="hideAllPopups();"
             @sucess-add-member="hideAllPopups();"
           />
@@ -443,7 +403,7 @@
         >
           <div class="p-4">
             <CorporationsSecret
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               :goBackBtn="false"
               :cancelBtn="true"
               :setNewSecret="true"
@@ -455,7 +415,7 @@
       </Teleport>
     </ClientOnly>
 
-    <ClientOnly v-if="isPopupVisible && memberDetailsPopup">
+    <ClientOnly v-if="isPopupVisible && memberDetailsPopup && clickedMember">
       <Teleport to="#popup-container">
         <UiPopup
           @close-popup="hideAllPopups()"
@@ -463,7 +423,7 @@
           <div v-if="!editMember" class="p-4">
             <MembersDetails
               :member="clickedMember"
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               @edit-member="editMember = true"
               @success-delete-member="hideAllPopups();"
             />
@@ -474,7 +434,7 @@
           >
             <MembersEdit
               :member="clickedMember"
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               @cancel-edit-member="hideAllPopups();"
               @success-edit-member="hideAllPopups();"
             />
@@ -488,7 +448,9 @@
         <UiPopup
           @close-popup="hideAllPopups()"
         >
-          <div class="p-4">
+          <div
+            v-if="clickedAttribute"
+            class="p-4">
             <UiHeaderH2>{{ $reslugify(clickedAttribute.name) }}</UiHeaderH2>
             <UiDivider />
             <div class="text-center">
@@ -499,7 +461,7 @@
               <UiButton 
                 class="m-1"
                 :text="'0'"
-                :layout="attributeButtonLayout(0, clickedAttribute.value)"
+                :layout="attributeButtonLayout(0, clickedAttribute.set)"
                 @click="setAttributeLevel(clickedAttribute!,  0)"
               />
               <UiButton 
@@ -507,7 +469,7 @@
                 class="m-1"
                 :key="idx"
                 :text="`${idx}`"
-                :layout="attributeButtonLayout(idx, clickedAttribute.value)"
+                :layout="attributeButtonLayout(idx, clickedAttribute.set)"
                 @click="setAttributeLevel(clickedAttribute!,  idx)"
               />
             </div>

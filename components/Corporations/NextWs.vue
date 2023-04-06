@@ -63,7 +63,7 @@
 <template>
   <div class="relative">
     <UiCard
-      class="w-10 text-center mx-auto cursor-pointer"
+      class="w-10 text-center mx-auto cursor-pointer mb-1"
       @click="showNextScanButtons = !showNextScanButtons"
     >
       <span v-if="!sendRequest">
