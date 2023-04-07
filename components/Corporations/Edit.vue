@@ -21,7 +21,8 @@
     flagShip: corporation.value!.flagShip,
     requiredInfluence: corporation.value!.requiredInfluence,
     wsWins: corporation.value!.wsWins,
-    discord: corporation.value!.discord
+    discord: corporation.value!.discord,
+    serverId: corporation.value!.serverId
   })
   const sendRequest = ref(false);
 
@@ -211,6 +212,12 @@
       :name="'Discord'"
       :value="corporationForm.discord"
       :label="'Discord'"
+    />
+    <UiInputText
+      v-model="corporationForm.serverId"
+      :name="'ServerID'"
+      :value="corporationForm.serverId"
+      :label="'Server ID'"
     />
     <UiButton
       :text="'Submit'"

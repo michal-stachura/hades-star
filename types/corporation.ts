@@ -5,6 +5,7 @@ export interface Corporation {
   id: string;
   name: string;
   membersCount?: number;
+  serverId: number
 }
 
 export interface CorporationDetails extends Corporation {
