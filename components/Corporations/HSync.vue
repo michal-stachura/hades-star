@@ -1,8 +1,35 @@
 <script setup lang="ts">
-  const { corporation, getCorporationSecret } = useCorporationDetails();
+  import * as pkg from "vue-toastification";
+  const { useToast } = pkg;
+
+  const { corporation, currentCorporationId, getCorporationSecret } = useCorporationDetails();
   const config = useRuntimeConfig();
   const emit = defineEmits(['editCorporation']);
+  const sendRequest = ref(false);
 
+  async function syncMembers() {
+    if (sendRequest.value) return;
+
+    sendRequest.value = true;
+    
+    const { data, error, pending } = await useFetch(
+      `${config.apiBaseUrl}/corporations/${currentCorporationId.value}/sync-members/`,
+      {
+        method: `GET`,
+        headers: [
+          ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
+        ]
+      }
+    )
+    
+    if (data.value) {
+      console.log(data.value)
+    }
+    if (error.value && error.value.response) {
+      useToast().error(`${error.value.response.status} - ${error.value.data.error}`)
+    }
+    sendRequest.value = false;
+  }
 </script>
 
 <template>
@@ -29,5 +56,19 @@
         />
       </div>
     </UiInfo>
+    <div v-else>
+      <div class="text-center">
+        <UiParagraph>Please choose one of sychronization</UiParagraph>
+        <UiButton
+          :text="'Corporation members'"
+          class="mr-1"
+          @click="syncMembers()"
+        />
+        <UiButton
+          :text="'Tech levels for current members'"
+        />
+
+      </div>
+    </div>
   </div>
 </template>
