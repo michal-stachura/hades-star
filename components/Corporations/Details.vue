@@ -35,8 +35,8 @@
       discordCopied.value = false;
     }, 2000)
   }
-  function copyServerId() {
-    $clipboard(props.corporation.serverId)
+  function copyRoleId() {
+    $clipboard(props.corporation.roleId)
     serverIdCopied.value = true;
     setTimeout(() => {
       serverIdCopied.value = false;
@@ -93,15 +93,16 @@
         </div>
         <div>
           <UiLabel 
-            :text="'Server ID'"
+            :text="'Role ID'"
           />  
-          {{ corporation.serverId }}  
+          {{ corporation.roleId }}  
           <div>
             <UiButton
-              :text="'Copy Server ID'"
+            v-if="corporation.roleId"
+              :text="'Copy Role ID'"
               :layout="'transparent'"
               :size="'sm'"
-              @click="copyServerId"
+              @click="copyRoleId"
             />
             <UiBadge
               v-if="serverIdCopied"

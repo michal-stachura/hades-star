@@ -22,7 +22,7 @@
     requiredInfluence: corporation.value!.requiredInfluence,
     wsWins: corporation.value!.wsWins,
     discord: corporation.value!.discord,
-    serverId: corporation.value!.serverId
+    roleId: corporation.value!.roleId
   })
   const sendRequest = ref(false);
 
@@ -214,10 +214,10 @@
       :label="'Discord'"
     />
     <UiInputText
-      v-model="corporationForm.serverId"
-      :name="'ServerID'"
-      :value="corporationForm.serverId"
-      :label="'Server ID'"
+      v-model="corporationForm.roleId"
+      :name="'RoleID'"
+      :value="corporationForm.roleId"
+      :label="'Role ID'"
     />
     <UiButton
       :text="'Submit'"

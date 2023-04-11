@@ -1,11 +1,20 @@
 <script setup lang="ts">
   import * as pkg from "vue-toastification";
+  import { HSCMember } from "@/types/hscmember";
+  interface HSCSyncResponse {
+    meta?: Object;
+    data?: HSCMember[];
+  }
   const { useToast } = pkg;
 
   const { corporation, currentCorporationId, getCorporationSecret } = useCorporationDetails();
   const config = useRuntimeConfig();
   const emit = defineEmits(['editCorporation']);
-  const sendRequest = ref(false);
+  const sendRequest = ref<boolean>(false);
+  const syncedMembers = ref<HSCSyncResponse | null>(null);
+  const filteredMembers = ref<HSCMember[]>([]);
+  const selectedMembers = ref<HSCMember[]>([]);
+  const filteredMemberName = ref<string>('');
 
   async function syncMembers() {
     if (sendRequest.value) return;
@@ -23,21 +32,56 @@
     )
     
     if (data.value) {
-      console.log(data.value)
+      syncedMembers.value = {...data.value};
+      filterMembers();
     }
     if (error.value && error.value.response) {
       useToast().error(`${error.value.response.status} - ${error.value.data.error}`)
     }
     sendRequest.value = false;
   }
+
+  function filterMembers(): void {
+    if (
+      filteredMemberName.value === ''
+      && syncedMembers.value
+      && syncedMembers.value.data
+    ) {
+      filteredMembers.value = syncedMembers.value.data
+    } else if (
+      filteredMemberName.value !== ''
+      && syncedMembers.value
+      && syncedMembers.value.data
+    ) {
+      const regex = new RegExp(filteredMemberName.value, 'i');
+      filteredMembers.value = syncedMembers.value.data.filter(member => regex.test(member.name))
+    }
+  }
+
+  function toggleSelection(member: HSCMember): void {
+    if (selectedMembers.value) {
+      console.log(member)
+      const idx = selectedMembers.value.findIndex(obj => obj.id == member.id)
+      if (idx !== -1) {
+        selectedMembers.value.splice(idx, 1)
+      } else {
+        selectedMembers.value.push(member);
+      }
+
+    }
+  }
+
+  function isSelectedMember (member: HSCMember): boolean {
+    if (selectedMembers.value) {
+      return selectedMembers.value.some(obj => obj.id === member.id);
+    }
+    return false
+  }
 </script>
 
 <template>
   <div class="p-2">
-    <UiParagraph>
-      You can import data from Hades Star Compendium and Discord Bot. 
-    </UiParagraph>
-    <UiInfo v-if="corporation && !corporation.serverId">
+    <UiInfo v-if="corporation && !corporation.roleId">
       Before you can import data you must provide your corporation server ID. You can find it in your corp Discord.<br />
       <video
         class="mx-auto p-2 border border-gray-600 rounded"
@@ -57,7 +101,10 @@
       </div>
     </UiInfo>
     <div v-else>
-      <div class="text-center">
+      <div class="text-center" v-if="!syncedMembers">
+        <UiParagraph>
+          You can import data from Hades Star Compendium and Discord Bot. 
+        </UiParagraph>
         <UiParagraph>Please choose one of sychronization</UiParagraph>
         <UiButton
           :text="'Corporation members'"
@@ -67,7 +114,39 @@
         <UiButton
           :text="'Tech levels for current members'"
         />
-
+      </div>
+      <div v-else class="max-w-screen-lg">
+        <div class="flex items-center">
+          <div class="grow">
+            <UiParagraph v-if="corporation">
+              Select members you want to add to <strong>{{ corporation.name }}</strong>
+            </UiParagraph>
+          </div>
+          <div class="grow-0">
+            <UiInputText
+              v-model="filteredMemberName"
+              v-focus
+              :name="'membersFilter'"
+              :type="'text'"
+              :value="filteredMemberName"
+              :placeholder="'Search by name'"
+              @keyup="filterMembers()"
+            />
+          </div>
+        </div>        
+        <UiButton
+          v-for="member in filteredMembers"
+          :key="member.id"
+          :text="member.name"
+          :size="'sm'"
+          :layout="isSelectedMember(member) ? '' : 'transparent'"
+          class="mr-1 mb-1"
+          @click="toggleSelection(member)"
+        />
+        <UiDivider class="mt-4"/>
+        <UiButton 
+          :text="'Add selected members'"
+        />
       </div>
     </div>
   </div>
