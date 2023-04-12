@@ -9,7 +9,7 @@
 
   const { corporation, currentCorporationId, getCorporationSecret } = useCorporationDetails();
   const config = useRuntimeConfig();
-  const emit = defineEmits(['editCorporation']);
+  const emit = defineEmits(['editCorporation', 'closePopup']);
   const sendRequest = ref<boolean>(false);
   const syncedMembers = ref<HSCSyncResponse | null>(null);
   const filteredMembers = ref<HSCMember[]>([]);
@@ -38,7 +38,35 @@
     if (error.value && error.value.response) {
       useToast().error(`${error.value.response.status} - ${error.value.data.error}`)
     }
-    sendRequest.value = false;
+    sendRequest.value = pending.value;
+  }
+
+  async function addSelectedMembers() {
+    if (sendRequest.value) return;
+    sendRequest.value = true;
+
+    const { data, error, pending} = await useFetch(
+      `${config.apiBaseUrl}/corporations/${currentCorporationId.value}/sync-members/`,
+      {
+        method: `POST`,
+        body: {
+          corporationId: currentCorporationId.value,
+          selectedMembers: selectedMembers.value
+        },
+        headers: [
+        ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
+        ]
+      }
+    )
+
+    if (data.value) {
+      console.log(data.value);
+      emit('closePopup');
+    }
+    if (error.value && error.value.response) {
+      useToast().error(`${error.value.response.status} - ${error.value.data.error}`)
+    }
+    sendRequest.value = pending.value;
   }
 
   function filterMembers(): void {
@@ -60,7 +88,6 @@
 
   function toggleSelection(member: HSCMember): void {
     if (selectedMembers.value) {
-      console.log(member)
       const idx = selectedMembers.value.findIndex(obj => obj.id == member.id)
       if (idx !== -1) {
         selectedMembers.value.splice(idx, 1)
@@ -146,6 +173,8 @@
         <UiDivider class="mt-4"/>
         <UiButton 
           :text="'Add selected members'"
+          :size="'sm'"
+          @click="addSelectedMembers()"
         />
       </div>
     </div>

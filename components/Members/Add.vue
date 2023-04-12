@@ -12,7 +12,7 @@ const { useToast } = pkg
 
   const memberForm = reactive({
     name: '',
-    corporation: [props.corporationId],
+    corporationId: [props.corporationId],
   });
   const { getCorporationSecret, addCorporationMember } = useCorporationDetails();
 

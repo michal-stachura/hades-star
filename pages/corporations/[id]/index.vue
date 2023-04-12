@@ -492,6 +492,7 @@
           <CorporationsHSync 
             :corporationId.value="currentCorporationId"
             @edit-corporation="hideAllPopups(); editCorporationPopup = true; popupToggleVisibility()"
+            @close-popup="hideAllPopups()"
           />
         </UiPopup>
       </Teleport>
