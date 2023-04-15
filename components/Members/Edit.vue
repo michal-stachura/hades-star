@@ -26,8 +26,9 @@
     bsLevel: props.member.bsLevel,
     maxMods: props.member.maxMods,
     asLeader: props.member.asLeader,
+    hscId: props.member.hscId,
     wsShipRoles: props.member.wsShipRoles || [],
-    corporationId: props.corporationId
+    corporation: props.corporationId
   })
 
   const { getCorporationSecret, updateCorporationMember } = useCorporationDetails();
@@ -129,6 +130,12 @@
         :name="'memberName'"
         :value="memberForm.name"
         :label="'Member Nickname'"
+      />
+      <UiInputText 
+        v-model="memberForm.hscId"
+        :name="'memberHscId'"
+        :value="memberForm.hscId"
+        :label="'HadesStar Compendium ID'"
       />
       <UiSelect
         v-model="memberForm.timeZone"

@@ -37,7 +37,7 @@
         method: 'PATCH',
         body: {
           nextWs: status,
-          corporationId: props.corporationId,
+          corporation: props.corporationId,
         },
         headers: [
           ['Corporation-Secret', getCorporationSecret(props.corporationId)]

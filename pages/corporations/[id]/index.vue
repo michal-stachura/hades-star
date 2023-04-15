@@ -39,7 +39,7 @@
             attributeId: attribute.id,
             set: level,
             attributeName: attribute.name,
-            corporationId: currentCorporationId.value,
+            corporation: currentCorporationId.value,
           },
           headers: [
             ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
@@ -151,10 +151,14 @@
                 <UiCard
                   v-if="member.isVisible"
                   @click="showMemberDetails(member)"
-                  class="cursor-pointer mb-1"
+                  class="cursor-pointer relative mb-1"
                   v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
                 >
-                  {{ member.name }}
+                  <font-awesome-icon
+                    v-if="member.hscId"
+                    :icon="['fad', 'star']"
+                    class="text-white text-xs mb-0.5"
+                  /> {{ member.name }}
                 </UiCard>
               </span>
             </div>

@@ -7,7 +7,7 @@
   }
   const { useToast } = pkg;
 
-  const { corporation, currentCorporationId, getCorporationSecret } = useCorporationDetails();
+  const { corporation, currentCorporationId, getCorporationSecret, setCorporationDetails } = useCorporationDetails();
   const config = useRuntimeConfig();
   const emit = defineEmits(['editCorporation', 'closePopup']);
   const sendRequest = ref<boolean>(false);
@@ -60,7 +60,7 @@
     )
 
     if (data.value) {
-      console.log(data.value);
+      setCorporationDetails(data.value)
       emit('closePopup');
     }
     if (error.value && error.value.response) {

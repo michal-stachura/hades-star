@@ -66,6 +66,7 @@
         <UiParagraph>BattleShip Level</UiParagraph>
         <UiParagraph>Max Mods</UiParagraph>
         <UiParagraph>Willing to be Leader</UiParagraph>
+        <UiParagraph>HadesStear Compendium ID</UiParagraph>
         <UiParagraph>White Star BattleShip Preferences:</UiParagraph>
       </div>
       <div class="grow-0 text-right">
@@ -74,6 +75,7 @@
         <UiParagraph>{{ member.bsLevel || '-' }}</UiParagraph>
         <UiParagraph>{{ member.maxMods || '-' }}</UiParagraph>
         <UiParagraph>{{ member.asLeader === true ? 'Yes' : 'No' }}</UiParagraph>
+        <UiParagraph>{{ member.hscId || '-' }}</UiParagraph>
       </div>
     </div>
     <div class="mb-4">
