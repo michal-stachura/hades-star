@@ -24,7 +24,8 @@
     timeZone: props.member.timeZone,
     rsLevel: props.member.rsLevel,
     bsLevel: props.member.bsLevel,
-    maxMods: props.member.maxMods,
+    minerLevel: props.member.minerLevel,
+    transportLevel: props.member.transportLevel,
     asLeader: props.member.asLeader,
     hscId: props.member.hscId,
     wsShipRoles: props.member.wsShipRoles || [],
@@ -91,6 +92,7 @@
   }
 
   async function submit() {
+    console.log(memberForm)
     if (sendRequest.value) return;
 
     sendRequest.value = true

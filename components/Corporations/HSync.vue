@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import * as pkg from "vue-toastification";
   import { HSCMember } from "@/types/hscmember";
+  import { CorporationDetails } from '@/types/corporation';
   interface HSCSyncResponse {
     meta?: Object;
     data?: HSCMember[];
@@ -60,7 +61,7 @@
     )
 
     if (data.value) {
-      setCorporationDetails(data.value)
+      setCorporationDetails({...data.value as CorporationDetails})
       emit('closePopup');
     }
     if (error.value && error.value.response) {

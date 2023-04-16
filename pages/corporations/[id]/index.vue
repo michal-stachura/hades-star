@@ -152,13 +152,10 @@
                   v-if="member.isVisible"
                   @click="showMemberDetails(member)"
                   class="cursor-pointer relative mb-1"
+                  :class="{'border-l-4 border-blue-500': member.hscId}"
                   v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
                 >
-                  <font-awesome-icon
-                    v-if="member.hscId"
-                    :icon="['fad', 'star']"
-                    class="text-white text-xs mb-0.5"
-                  /> {{ member.name }}
+                  {{ member.name }}
                 </UiCard>
               </span>
             </div>
