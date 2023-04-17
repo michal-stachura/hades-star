@@ -42,6 +42,31 @@
     sendRequest.value = pending.value;
   }
 
+  async function syncTechLevels() {
+    if (sendRequest.value) return;
+    sendRequest.value = true;
+    const { data, error, pending } = await useFetch(
+      `${config.apiBaseUrl}/corporations/${currentCorporationId.value}/sync-tech/`,
+      {
+        method: `GET`,
+        headers: [
+          ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
+        ]
+      }
+    )
+
+    if (data.value) {
+      setCorporationDetails({...data.value as CorporationDetails})
+      emit('closePopup');
+      useToast().success(`Members tech levels sync finished.`)
+    }
+    if (error.value && error.value.response) {
+      useToast().error(`${error.value.response.status} - ${error.value.data.error}`)
+    }
+
+    sendRequest.value = pending.value;
+  }
+
   async function addSelectedMembers() {
     if (sendRequest.value) return;
     sendRequest.value = true;
@@ -142,6 +167,7 @@
         />
         <UiButton
           :text="'Tech levels for current members'"
+          @click="syncTechLevels()"
         />
       </div>
       <div v-else class="max-w-screen-lg">
