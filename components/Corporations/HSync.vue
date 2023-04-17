@@ -63,6 +63,7 @@
     if (data.value) {
       setCorporationDetails({...data.value as CorporationDetails})
       emit('closePopup');
+      useToast().success(`Members sync finished. Please verify their timezones :)`)
     }
     if (error.value && error.value.response) {
       useToast().error(`${error.value.response.status} - ${error.value.data.error}`)
