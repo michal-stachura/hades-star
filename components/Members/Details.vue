@@ -28,11 +28,11 @@
     sendRequest.value = true;
 
     const { pending } = await useFetch(
-      `${config.apiBaseUrl}/members/${props.member.id}/remove-corporation/`,
+      `${config.apiBaseUrl}/members/${props.member.id}/`,
       {
         method: 'DELETE',
         body: {
-          corporationId: props.corporationId,
+          corporation: props.corporationId,
         },
         headers: [
           ['Corporation-Secret', getCorporationSecret(props.corporationId)]

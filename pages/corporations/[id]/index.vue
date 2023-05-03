@@ -51,7 +51,8 @@
         attribute.set = data.value.set
         clickedMember.value = undefined
         clickedAttribute.value = undefined
-        popupToggleVisibility()
+        hideAllPopups()
+        useToast().success('Updated successfully')
       }
       if (error.value) {
         if (error.value.response) {
@@ -85,6 +86,11 @@
     popupToggleVisibility()
   }
 
+  function showHsyncPopup(): void {
+    hSyncPopup.value = true;
+    popupToggleVisibility();
+  }
+
   const attributeButtonLayout = (currentValue: Number, attributeValue: Number) => {
     return currentValue === attributeValue ? '' : 'transparent'
   }
@@ -96,7 +102,7 @@
   <div>
     <div v-if="loadingCorporation">
       <UiCard>
-        Fetching data...
+        <UiLoader /> Fetching data...
       </UiCard>
     </div>
     <div v-else>
@@ -123,7 +129,7 @@
             class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
             :class="{'max-h-[28rem]': detailsVisible}"
             :corporation="corporation"
-            @h-sync="hSyncPopup = true; popupToggleVisibility();"
+            @h-sync="showHsyncPopup()"
           />
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
             <div>
@@ -340,7 +346,16 @@
               <UiParagraph>No members yet. Please add first member</UiParagraph>
               <UiButton 
                 :text="'Add Member'"
+                :size="'sm'"
+                :layout="'transparent'"
+                class="mr-2"
                 @click="addMemberPopup = true; popupToggleVisibility()"
+              />
+              <UiButton
+                :text="'Sync data with HS Compendium'"
+                :size="'sm'"
+                :layout="'transparent'"
+                @click="showHsyncPopup()"
               />
             </UiCard>
           </div>

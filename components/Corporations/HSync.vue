@@ -12,7 +12,7 @@
   const config = useRuntimeConfig();
   const emit = defineEmits(['editCorporation', 'closePopup']);
   const sendRequest = ref<boolean>(false);
-  const syncedMembers = ref<HSCSyncResponse | null>(null);
+  const syncedMembers = ref<HSCMember[]>([]);
   const filteredMembers = ref<HSCMember[]>([]);
   const selectedMembers = ref<HSCMember[]>([]);
   const filteredMemberName = ref<string>('');
@@ -22,7 +22,7 @@
 
     sendRequest.value = true;
     
-    const { data, error, pending } = await useFetch(
+    const { data, error, pending } = await useFetch<HSCMember[]>(
       `${config.apiBaseUrl}/corporations/${currentCorporationId.value}/sync-members/`,
       {
         method: `GET`,
@@ -32,8 +32,8 @@
       }
     )
     
-    if (data.value) {
-      syncedMembers.value = {...data.value};
+    if (data.value) {    
+      syncedMembers.value = data.value.filter(item => !corporation.value?.members.some(member => member.hscId === item.id));
       filterMembers();
     }
     if (error.value && error.value.response) {
@@ -59,6 +59,7 @@
       setCorporationDetails({...data.value as CorporationDetails})
       emit('closePopup');
       useToast().success(`Members tech levels sync finished.`)
+      
     }
     if (error.value && error.value.response) {
       useToast().error(`${error.value.response.status} - ${error.value.data.error}`)
@@ -100,16 +101,14 @@
     if (
       filteredMemberName.value === ''
       && syncedMembers.value
-      && syncedMembers.value.data
     ) {
-      filteredMembers.value = syncedMembers.value.data
+      filteredMembers.value = syncedMembers.value
     } else if (
       filteredMemberName.value !== ''
       && syncedMembers.value
-      && syncedMembers.value.data
     ) {
       const regex = new RegExp(filteredMemberName.value, 'i');
-      filteredMembers.value = syncedMembers.value.data.filter(member => regex.test(member.name))
+      filteredMembers.value = syncedMembers.value.filter(member => regex.test(member.name))
     }
   }
 
@@ -155,20 +154,29 @@
       </div>
     </UiInfo>
     <div v-else>
-      <div class="text-center" v-if="!syncedMembers">
+      <div class="text-center" v-if="syncedMembers.length === 0">
         <UiParagraph>
           You can import data from Hades Star Compendium and Discord Bot. 
         </UiParagraph>
         <UiParagraph>Please choose one of sychronization</UiParagraph>
-        <UiButton
-          :text="'Corporation members'"
-          class="mr-1"
-          @click="syncMembers()"
-        />
-        <UiButton
-          :text="'Tech levels for current members'"
-          @click="syncTechLevels()"
-        />
+        <div v-if="!sendRequest">
+          <UiButton
+            :text="'Corporation members'"
+            :layout="'transparent'"
+            :size="'sm'"
+            class="mr-2"
+            @click="syncMembers()"
+          />
+          <UiButton
+            :text="'Tech levels for current members'"
+            :layout="'transparent'"
+            :size="'sm'"
+            @click="syncTechLevels()"
+          />
+        </div>
+        <div v-else>
+          <UiLoader class="text-4xl"/>
+        </div>
       </div>
       <div v-else class="max-w-screen-lg">
         <div class="flex items-center">
@@ -202,6 +210,7 @@
         <UiButton 
           :text="'Add selected members'"
           :size="'sm'"
+          :layout="'transparent'"
           @click="addSelectedMembers()"
         />
       </div>
