@@ -16,6 +16,7 @@
   const memberDetailsPopup = ref(false);
   const memberAttributePopup = ref(false);
   const editCorporationPopup = ref(false);
+  const hSyncPopup = ref(false);
   const detailsVisible = ref(false);
   
   const { corporation, currentCorporationId, loadingCorporation, getCorporationSecret, fetchCorporationData } = useCorporationDetails();
@@ -38,7 +39,7 @@
             attributeId: attribute.id,
             set: level,
             attributeName: attribute.name,
-            corporationId: currentCorporationId.value,
+            corporation: currentCorporationId.value,
           },
           headers: [
             ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
@@ -50,7 +51,8 @@
         attribute.set = data.value.set
         clickedMember.value = undefined
         clickedAttribute.value = undefined
-        popupToggleVisibility()
+        hideAllPopups()
+        useToast().success('Updated successfully')
       }
       if (error.value) {
         if (error.value.response) {
@@ -67,6 +69,7 @@
     memberDetailsPopup.value = false;
     memberAttributePopup.value = false;
     editCorporationPopup.value = false;
+    hSyncPopup.value = false;
     popupToggleVisibility();
   }
 
@@ -83,6 +86,11 @@
     popupToggleVisibility()
   }
 
+  function showHsyncPopup(): void {
+    hSyncPopup.value = true;
+    popupToggleVisibility();
+  }
+
   const attributeButtonLayout = (currentValue: Number, attributeValue: Number) => {
     return currentValue === attributeValue ? '' : 'transparent'
   }
@@ -94,7 +102,7 @@
   <div>
     <div v-if="loadingCorporation">
       <UiCard>
-        Fetching data...
+        <UiLoader /> Fetching data...
       </UiCard>
     </div>
     <div v-else>
@@ -118,9 +126,10 @@
           </div>
           <UiDivider />
           <CorporationsDetails 
-            :corporation="corporation"
             class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
-            :class="{'max-h-[24rem]': detailsVisible}"
+            :class="{'max-h-[28rem]': detailsVisible}"
+            :corporation="corporation"
+            @h-sync="showHsyncPopup()"
           />
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
             <div>
@@ -148,7 +157,8 @@
                 <UiCard
                   v-if="member.isVisible"
                   @click="showMemberDetails(member)"
-                  class="cursor-pointer mb-1"
+                  class="cursor-pointer relative mb-1"
+                  :class="{'border-l-4 border-blue-500': member.hscId}"
                   v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
                 >
                   {{ member.name }}
@@ -336,7 +346,16 @@
               <UiParagraph>No members yet. Please add first member</UiParagraph>
               <UiButton 
                 :text="'Add Member'"
+                :size="'sm'"
+                :layout="'transparent'"
+                class="mr-2"
                 @click="addMemberPopup = true; popupToggleVisibility()"
+              />
+              <UiButton
+                :text="'Sync data with HS Compendium'"
+                :size="'sm'"
+                :layout="'transparent'"
+                @click="showHsyncPopup()"
               />
             </UiCard>
           </div>
@@ -474,6 +493,23 @@
               />
             </div>
           </div>
+        </UiPopup>
+      </Teleport>
+    </ClientOnly>
+
+    <ClientOnly
+      v-if="isPopupVisible && hSyncPopup"
+    >
+      <Teleport to="#popup-container">
+        <UiPopup
+          :header="'HS Compendium Data Sync'"
+          @close-popup="hideAllPopups()"
+        >
+          <CorporationsHSync 
+            :corporationId.value="currentCorporationId"
+            @edit-corporation="hideAllPopups(); editCorporationPopup = true; popupToggleVisibility()"
+            @close-popup="hideAllPopups()"
+          />
         </UiPopup>
       </Teleport>
     </ClientOnly>

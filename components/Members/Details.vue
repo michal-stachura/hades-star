@@ -28,11 +28,11 @@
     sendRequest.value = true;
 
     const { pending } = await useFetch(
-      `${config.apiBaseUrl}/members/${props.member.id}/remove-corporation/`,
+      `${config.apiBaseUrl}/members/${props.member.id}/`,
       {
         method: 'DELETE',
         body: {
-          corporationId: props.corporationId,
+          corporation: props.corporationId,
         },
         headers: [
           ['Corporation-Secret', getCorporationSecret(props.corporationId)]
@@ -64,16 +64,20 @@
         <UiParagraph>Timezone</UiParagraph>
         <UiParagraph>Red Star Level</UiParagraph>
         <UiParagraph>BattleShip Level</UiParagraph>
-        <UiParagraph>Max Mods</UiParagraph>
+        <UiParagraph>Miner Level</UiParagraph>
+        <UiParagraph>Transport Level</UiParagraph>
         <UiParagraph>Willing to be Leader</UiParagraph>
+        <UiParagraph>HadesStear Compendium ID</UiParagraph>
         <UiParagraph>White Star BattleShip Preferences:</UiParagraph>
       </div>
       <div class="grow-0 text-right">
         <UiParagraph>{{ member.timeZone || '-' }}</UiParagraph>
         <UiParagraph>{{ member.rsLevel || '-' }}</UiParagraph>
         <UiParagraph>{{ member.bsLevel || '-' }}</UiParagraph>
-        <UiParagraph>{{ member.maxMods || '-' }}</UiParagraph>
+        <UiParagraph>{{ member.minerLevel || '-' }}</UiParagraph>
+        <UiParagraph>{{ member.transportLevel || '-' }}</UiParagraph>
         <UiParagraph>{{ member.asLeader === true ? 'Yes' : 'No' }}</UiParagraph>
+        <UiParagraph>{{ member.hscId || '-' }}</UiParagraph>
       </div>
     </div>
     <div class="mb-4">

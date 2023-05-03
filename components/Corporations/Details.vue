@@ -9,6 +9,7 @@
       type: Object as PropType<CorporationDetails>,
     }
   });
+  const emit = defineEmits(['HSync'])
   const { $clipboard } = useNuxtApp();
   const route = useRoute();
 
@@ -16,6 +17,7 @@
   
   const urlCopied = ref(false);
   const discordCopied = ref(false);
+  const serverIdCopied = ref(false);
 
   function copyHeadquatersUrl() {
     if (process.client) {  
@@ -33,50 +35,82 @@
       discordCopied.value = false;
     }, 2000)
   }
+  function copyRoleId() {
+    $clipboard(props.corporation.roleId)
+    serverIdCopied.value = true;
+    setTimeout(() => {
+      serverIdCopied.value = false;
+    }, 2000)
+  }
 </script>
 
 <template>
   <div>
-    <UiCard>
-      <div>
-        <UiLabel 
-          :text="'Headquater ID'"
-        />
-        {{ corporation.id }}
+    <UiCard
+      class="mb-1"
+      :footer="true"
+    >
+      <div
+        class="grid grid-cols-2 gap-4 mb-4"
+      >
         <div>
-          <UiButton
-            :text="'Copy Headquater website'"
-            :layout="'transparent'"
-            :size="'sm'"
-            @click="copyHeadquatersUrl"
+          <UiLabel 
+            :text="'Headquater ID'"
           />
-          <UiBadge
-            v-if="urlCopied"
-            :text="'Copied'"
-            class="float-right mr-0 mt-1"
-          />
-        </div>
-      </div>
-      <div class="mt-2 mb-4">
-        <span v-if="corporation.discord">
-          <UiLabel
-          :text="'Discord'"
-          />
-          {{ corporation.discord }}
+          {{ corporation.id }}
           <div>
             <UiButton
-              :text="'Copy Discord URL'"
+              :text="'Copy Headquater website'"
               :layout="'transparent'"
               :size="'sm'"
-              @click="copyDiscordUrl"
+              @click="copyHeadquatersUrl"
             />
             <UiBadge
-              v-if="discordCopied"
+              v-if="urlCopied"
               :text="'Copied'"
               class="float-right mr-0 mt-1"
             />
           </div>
-        </span>
+          <div class="mt-2" v-if="corporation.discord">
+            <UiLabel
+              :text="'Discord'"
+            />
+            {{ corporation.discord }}
+            <div>
+              <UiButton
+                :text="'Copy Discord URL'"
+                :layout="'transparent'"
+                :size="'sm'"
+                @click="copyDiscordUrl"
+              />
+              <UiBadge
+                v-if="discordCopied"
+                :text="'Copied'"
+                class="float-right mr-0 mt-1"
+              />
+            </div>
+          </div>
+        </div>
+        <div>
+          <UiLabel 
+            :text="'Role ID'"
+          />  
+          {{ corporation.roleId }}  
+          <div>
+            <UiButton
+            v-if="corporation.roleId"
+              :text="'Copy Role ID'"
+              :layout="'transparent'"
+              :size="'sm'"
+              @click="copyRoleId"
+            />
+            <UiBadge
+              v-if="serverIdCopied"
+              :text="'Copied'"
+              class="float-right mr-0 mt-1"
+            />
+          </div>
+        </div>
       </div>
       <UiDivider />
       <div class="grid grid-cols-2 gap-4">
@@ -97,6 +131,14 @@
           <UiHeaderH1>{{ corporation.wsWins }}</UiHeaderH1>
         </div>
       </div>
+      <template #footer >
+        <UiButton
+          :text="'Sync data with HS Compendium'"
+          :layout="'transparent'"
+          :size="'sm'"
+          @click="emit('HSync')"
+        />
+      </template>
     </UiCard>
   </div>
 </template>

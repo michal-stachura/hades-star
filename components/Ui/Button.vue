@@ -63,7 +63,7 @@
     :type="props.type"
     :disabled="props.disabled"
   >
-    {{ props.text }}
+    <span v-html="props.text"></span>
   </button>
 </template>
 

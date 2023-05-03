@@ -24,11 +24,14 @@
     timeZone: props.member.timeZone,
     rsLevel: props.member.rsLevel,
     bsLevel: props.member.bsLevel,
-    maxMods: props.member.maxMods,
+    minerLevel: props.member.minerLevel,
+    transportLevel: props.member.transportLevel,
     asLeader: props.member.asLeader,
+    hscId: props.member.hscId,
     wsShipRoles: props.member.wsShipRoles || [],
-    corporationId: props.corporationId
+    corporation: props.corporationId
   })
+
 
   const { getCorporationSecret, updateCorporationMember } = useCorporationDetails();
   const sendRequest = ref(false);
@@ -87,9 +90,22 @@
     if (memberForm.bsLevel < 1) {
       memberForm.bsLevel = 1
     }
+    if (memberForm.minerLevel > 6) {
+      memberForm.minerLevel = 6
+    }
+    if (memberForm.minerLevel < 1) {
+      memberForm.minerLevel = 1
+    }
+    if (memberForm.transportLevel > 6) {
+      memberForm.transportLevel = 6
+    }
+    if (memberForm.transportLevel < 1) {
+      memberForm.transportLevel = 1
+    }
   }
 
   async function submit() {
+    console.log(memberForm)
     if (sendRequest.value) return;
 
     sendRequest.value = true
@@ -106,11 +122,11 @@
       
     if (data.value) {
       useToast().success('Member data updated successfully.');
-      updateCorporationMember({...data.value});
+      updateCorporationMember({...data.value as Member});
       emit('successEditMember');
     }
     
-    if (error.value) {
+    if (error.value && error.value.response) {
       useToast().error(`${error.value.response.status} - ${error.value.data.detail}`)
     }
     
@@ -130,6 +146,12 @@
         :value="memberForm.name"
         :label="'Member Nickname'"
       />
+      <UiInputText 
+        v-model="memberForm.hscId"
+        :name="'memberHscId'"
+        :value="memberForm.hscId"
+        :label="'HadesStar Compendium ID'"
+      />
       <UiSelect
         v-model="memberForm.timeZone"
         :values="commonTimezones"
@@ -139,6 +161,62 @@
       <div
         class="mt-2 grid grid-cols-2 gap-4"
       >
+        <div>
+          <UiLabel :text="'Miner Level'"/>
+          <div class="flex">
+            <div>
+              <UiInputText 
+              v-model="memberForm.minerLevel"
+              :value="memberForm.minerLevel"
+              :name="'minerLevel'"
+              :cssClasses="'w-12 text-center'"
+              @change="formVerify()"
+              />
+            </div>
+            <div class="mx-2">
+              <font-awesome-icon
+                icon="fa-duotone fa-square-minus"
+                class="text-4xl mt-0.5 cursor-pointer"
+                @click="memberForm.minerLevel--; formVerify()"
+              />
+            </div>
+            <div>
+              <font-awesome-icon
+                icon="fa-duotone fa-square-plus"
+                class="text-4xl mt-0.5 cursor-pointer"
+                @click="memberForm.minerLevel++; formVerify()"
+              />
+            </div>
+          </div>
+        </div>
+        <div>
+          <UiLabel :text="'Transport Level'"/>
+          <div class="flex">
+            <div>
+              <UiInputText 
+              v-model="memberForm.transportLevel"
+              :value="memberForm.transportLevel"
+              :name="'transportLevel'"
+              :cssClasses="'w-12 text-center'"
+              @change="formVerify()"
+              />
+            </div>
+            <div class="mx-2">
+              <font-awesome-icon
+                icon="fa-duotone fa-square-minus"
+                class="text-4xl mt-0.5 cursor-pointer"
+                @click="memberForm.transportLevel--; formVerify()"
+              />
+            </div>
+            <div>
+              <font-awesome-icon
+                icon="fa-duotone fa-square-plus"
+                class="text-4xl mt-0.5 cursor-pointer"
+                @click="memberForm.transportLevel++; formVerify()"
+              />
+            </div>
+          </div>
+        </div>
         <div>
           <UiLabel :text="'Red Star Level'"/>
           <div class="flex">
