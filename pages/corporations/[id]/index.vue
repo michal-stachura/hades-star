@@ -131,7 +131,7 @@
             :corporation="corporation"
             @h-sync="showHsyncPopup()"
           />
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
+          <div class="grid grid-cols-1 gap-1 lg:flex">
             <div>
               <CorporationsNextWsStats 
                 :members="corporation.members"
@@ -139,6 +139,9 @@
             </div>
             <div>
               <CorporationsFiltersCard />
+            </div>
+            <div>
+              <CorporationsPowerChart />
             </div>
           </div>
           <div

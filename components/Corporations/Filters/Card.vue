@@ -48,7 +48,7 @@
           :text="filter.name.toString()"
           :size="'sm'"
           :layout="clickedFilter === filter.id ? '' : 'transparent'"
-          :class="'mr-2'"
+          :class="'mr-2 mb-2'"
           @click="toggleFilter(filter.id)"
         />
     </span>

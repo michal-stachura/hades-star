@@ -23,21 +23,21 @@
       :size="'sm'"
       :layout="selectedMembers.length === 0 ? '' : 'transparent'"
       @click="updateSelectedMembers([])"
-      class="mr-2"      
+      class="mr-2 mb-2"      
     />
     <UiButton 
       :text="`R: ${countMembers(['R'])}`"
       :size="'sm'"
       :layout="isEqual(['R']) ? '' : 'transparent'"
       @click="updateSelectedMembers(['R'])"
-      class="mr-2"
+      class="mr-2 mb-2"
     />
     <UiButton 
       :text="`R&O: ${countMembers(['R', 'O'])}`"
       :size="'sm'"
       :layout="isEqual(['R', 'O']) ? '' : 'transparent'"
       @click="updateSelectedMembers(['R', 'O'])"
-      class="mr-2"
+      class="mr-2 mb-2"
     />
     <UiButton 
       :text="`Pending: ${countMembers(['-'])}`"

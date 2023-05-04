@@ -59,6 +59,17 @@ function getCorporationLocalStorageData(id: string): any | null {
   return null
 }
 
+function calculateAverageProgress(members: any[], keyName: string): number {
+  const progressArray = members
+    .flatMap(member => member.attributes[keyName])
+    .map((item: any) => item.progress);
+  
+  const sum = progressArray.reduce((a, b) => a + b, 0);
+  const average = sum / progressArray.length;
+  
+  return parseFloat(average.toFixed(2));
+}
+
 const useCorporationDetails = () => {
   const corporation = useState<CorporationDetails | null>('corporation');
   const loadingCorporation = useState<boolean>('loadingCorporation', () => true);
@@ -240,6 +251,28 @@ const useCorporationDetails = () => {
     }
   }
 
+  const corpPower = () => {
+    if (corporation.value) {
+      
+      const weaponAverage = calculateAverageProgress(corporation.value.members, 'Weapon')
+      const shieldAverage = calculateAverageProgress(corporation.value.members, 'Shield')
+      const supportAverage = calculateAverageProgress(corporation.value.members, 'Support')
+      const miningAverage = calculateAverageProgress(corporation.value.members, 'Mining')
+      const tradeAverage = calculateAverageProgress(corporation.value.members, 'Trade')
+      const overallAverage = (weaponAverage + shieldAverage + tradeAverage + miningAverage + tradeAverage) / 5
+      return {
+        weapon: weaponAverage,
+        shield: shieldAverage,
+        support: supportAverage,
+        mining: miningAverage,
+        trade: tradeAverage,
+        overall: parseFloat(overallAverage.toFixed(2))
+      }
+    }
+
+    return 0
+  }
+
   const sortMembersByName = () => {
     if (corporation.value && corporation.value.members) {
       // sort by name
@@ -295,7 +328,8 @@ const useCorporationDetails = () => {
     hideMembersWithWsStatus,
     filterMembersByTechLevel,
     addCorporationFilter,
-    updateCorporationFilter
+    updateCorporationFilter,
+    corpPower,
   }
 }
 
