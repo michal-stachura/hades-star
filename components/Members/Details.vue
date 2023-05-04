@@ -12,7 +12,7 @@
     },
     corporationId: {
       type: String,
-        required: true
+      required: true
     }
   });
   const config = useRuntimeConfig();

@@ -16,6 +16,7 @@
   const memberDetailsPopup = ref(false);
   const memberAttributePopup = ref(false);
   const editCorporationPopup = ref(false);
+  const showMembersTime = ref(false);
   const hSyncPopup = ref(false);
   const detailsVisible = ref(false);
   
@@ -124,7 +125,6 @@
               />
             </div>
           </div>
-          <UiDivider />
           <CorporationsDetails 
             class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
             :class="{'max-h-[28rem]': detailsVisible}"
@@ -146,10 +146,17 @@
             class="flex mt-2">
             <div class="max-w-fit min-w-fit">
               <UiHeaderH2
-                class="mb-14 pb-1"
+                class="mb-6 pb-1"
               >
                 Username
               </UiHeaderH2>
+              <UiButton 
+                :text="'Show Time'"
+                :layout="showMembersTime ? '': 'transparent'"
+                :size="'sm'"
+                class="mb-1"
+                @click="showMembersTime = !showMembersTime"
+              />
               <span
                 v-for="member in corporation.members"
                 :key="member.id"
@@ -162,6 +169,10 @@
                   v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
                 >
                   {{ member.name }}
+                  <MembersCurrentTime
+                    v-if="showMembersTime"
+                    :member-timezone="member.timeZone"
+                  />
                 </UiCard>
               </span>
             </div>
