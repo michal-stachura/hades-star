@@ -16,6 +16,7 @@
   const memberDetailsPopup = ref(false);
   const memberAttributePopup = ref(false);
   const editCorporationPopup = ref(false);
+  const showMembersTime = ref(false);
   const hSyncPopup = ref(false);
   const detailsVisible = ref(false);
   
@@ -124,7 +125,6 @@
               />
             </div>
           </div>
-          <UiDivider />
           <CorporationsDetails 
             class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
             :class="{'max-h-[28rem]': detailsVisible}"
@@ -146,10 +146,17 @@
             class="flex mt-2">
             <div class="max-w-fit min-w-fit">
               <UiHeaderH2
-                class="mb-14 pb-1"
+                class="mb-6 pb-1"
               >
                 Username
               </UiHeaderH2>
+              <UiButton 
+                :text="'Show Time'"
+                :layout="showMembersTime ? '': 'transparent'"
+                :size="'sm'"
+                class="mb-1"
+                @click="showMembersTime = !showMembersTime"
+              />
               <span
                 v-for="member in corporation.members"
                 :key="member.id"
@@ -162,6 +169,10 @@
                   v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
                 >
                   {{ member.name }}
+                  <MembersCurrentTime
+                    v-if="showMembersTime"
+                    :member-timezone="member.timeZone"
+                  />
                 </UiCard>
               </span>
             </div>
@@ -193,7 +204,7 @@
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.weapon"
+                        v-for="attribute in corporation.members[0].attributes.Weapon"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -206,7 +217,7 @@
                     >
                       <MembersAttributeCard
                         v-if="member.attributes && member.isVisible"
-                        v-for="attribute in member.attributes.weapon"
+                        v-for="attribute in member.attributes.Weapon"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"
@@ -223,7 +234,7 @@
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.shield"
+                        v-for="attribute in corporation.members[0].attributes.Shield"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -236,7 +247,7 @@
                     >
                       <MembersAttributeCard
                         v-if="member.attributes && member.isVisible"
-                        v-for="attribute in member.attributes.shield"
+                        v-for="attribute in member.attributes.Shield"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"
@@ -253,7 +264,7 @@
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.support"
+                        v-for="attribute in corporation.members[0].attributes.Support"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -266,7 +277,7 @@
                     >
                       <MembersAttributeCard
                         v-if="member.attributes && member.isVisible"
-                        v-for="attribute in member.attributes.support"
+                        v-for="attribute in member.attributes.Support"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"
@@ -283,7 +294,7 @@
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.mining"
+                        v-for="attribute in corporation.members[0].attributes.Mining"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -296,7 +307,7 @@
                     >
                       <MembersAttributeCard
                         v-if="member.attributes && member.isVisible"
-                        v-for="attribute in member.attributes.mining"
+                        v-for="attribute in member.attributes.Mining"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"
@@ -313,7 +324,7 @@
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.trade"
+                        v-for="attribute in corporation.members[0].attributes.Trade"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -326,7 +337,7 @@
                     >
                       <MembersAttributeCard
                         v-if="member.attributes && member.isVisible"
-                        v-for="attribute in member.attributes.trade"
+                        v-for="attribute in member.attributes.Trade"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"

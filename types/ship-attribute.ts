@@ -7,9 +7,9 @@ export interface Attribute {
 }
 
 export interface ShipAttribute {
-  weapon: Array<Attribute>,
-  support: Array<Attribute>,
-  mining: Array<Attribute>,
-  trade: Array<Attribute>,
-  shield: Array<Attribute>,
+  Weapon: Array<Attribute>,
+  Support: Array<Attribute>,
+  Mining: Array<Attribute>,
+  Trade: Array<Attribute>,
+  Shield: Array<Attribute>,
 }
