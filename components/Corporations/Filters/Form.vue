@@ -31,8 +31,8 @@
     selectedAttributes.value = props.filter.conditions
   }
   
-  const clickedtAttributeGroup = ref<'weapon' | 'shield' | 'support' | 'mining' | 'trade'>('weapon');
-  const attributeGroups: Array<typeof clickedtAttributeGroup.value> = ['weapon', 'shield', 'support', 'mining', 'trade'];
+  const clickedtAttributeGroup = ref<'Weapon' | 'Shield' | 'Support' | 'Mining' | 'Trade'>('Weapon');
+  const attributeGroups: Array<typeof clickedtAttributeGroup.value> = ['Weapon', 'Shield', 'Support', 'Mining', 'Trade'];
   
   const filterForm = reactive({
     filterId: props.filter?.id ?? undefined,

@@ -12,17 +12,17 @@ function attributeGroup(filterId: string): keyof ShipAttribute {
   const supportIds = ["EMP", "TELEPORT", "RED_STAR_LIFE_EXTENDER", "REMOTE_REPAIR", "TIME_WRAP", "UNITY", "SANCTUARY", "STEALTH", "FORTIFY", "IMPULSE", "ALPHA_ROCKET","SALVAGE", "SUPRESS", "DESTINY", "BARRIER", "VENEGANCE", "DELTA_ROCKET", "LEAP", "BOND", "LASER_TURRET", "ALPHA_DRONE", "SUSPEND", "OMEGA_ROCKET", "REMOTE_BOMB"];
   const tradeIds = ["CARGO_BAY_EXTENSION", "SHIPMENT_COMPUTER", "TRADE_BOOST", "RUSH", "TRADE_BURST", "SHIPMENT_DRONE", "OFFLOAD", "SHIPMENT_BEAM", "ENTRUST", "DISPATCH", "RECALL", "RELIC_DRONE"];
   
-  let strKeyName: keyof ShipAttribute = 'weapon'
+  let strKeyName: keyof ShipAttribute = 'Weapon'
   if (weaponIds.includes(filterId)) {
-    strKeyName = 'weapon'
+    strKeyName = 'Weapon'
   } else if (shieldIds.includes(filterId)) {
-    strKeyName = 'shield'
+    strKeyName = 'Shield'
   } else if (miningIds.includes(filterId)) {
-    strKeyName = 'mining'
+    strKeyName = 'Mining'
   } else if (supportIds.includes(filterId)) {
-    strKeyName = 'support'
+    strKeyName = 'Support'
   } else if (tradeIds.includes(filterId)) {
-    strKeyName = 'trade'
+    strKeyName = 'Trade'
   } 
   return strKeyName
 }

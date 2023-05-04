@@ -208,11 +208,15 @@
         />
         <UiDivider class="mt-4"/>
         <UiButton 
+          v-if="!sendRequest"
           :text="'Add selected members'"
           :size="'sm'"
           :layout="'transparent'"
           @click="addSelectedMembers()"
         />
+        <div class="text-center" v-else>
+          <UiLoader class="text-4xl"/>
+        </div>
       </div>
     </div>
   </div>
