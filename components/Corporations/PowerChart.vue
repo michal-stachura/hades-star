@@ -49,9 +49,9 @@
   
     <div
       v-if="corpPowerObject"
-      class="flex items-end justify-end"
+      class="grid grid-cols-1 lg:flex justify-center mt-4 lg:mt-0 lg:justify-end"
     >
-      <div>
+      <div class="text-center">
         <UiCircleProgress
           :progress="corpPowerObject.overall"
           :animation-duration="1300"
@@ -70,12 +70,12 @@
         <UiParagraph>Corp Power</UiParagraph>
       </div>
       <div
-        class="flex transition-all duration-300"
-        :class="{'w-0': !showDetails, 'w-[400px]': showDetails}"
+        class="grid grid-cols-6 lg:flex transition-all duration-300"
+        :class="{'w-0': !showDetails, 'w-[350px] lg:w-[400px]': showDetails}"
       >
         <div
           v-if="attrVisible"
-          class="text-center transition-all duration-300"
+          class="text-center transition-all duration-300 inline-block col-span-2"
           :class="{'opacity-0': !zeroOpacity, 'opacity-100': zeroOpacity}"
         >
           <UiCircleProgress
@@ -91,7 +91,7 @@
         </div>
         <div
           v-if="attrVisible"
-          class="text-center transition-all duration-300"
+          class="text-center transition-all duration-300 inline-block col-span-2"
           :class="{'opacity-0': !zeroOpacity, 'opacity-100': zeroOpacity}"
         >
           <UiCircleProgress
@@ -108,7 +108,7 @@
         </div>
         <div
           v-if="attrVisible"
-          class="text-center transition-all duration-300"
+          class="text-center transition-all duration-300 inline-block col-span-2"
           :class="{'opacity-0': !zeroOpacity, 'opacity-100': zeroOpacity}"
         >
           <UiCircleProgress
@@ -125,7 +125,7 @@
         </div>
         <div
           v-if="attrVisible"
-          class="text-center transition-all duration-300"
+          class="text-center transition-all duration-300 inline-block col-span-2 col-start-2"
           :class="{'opacity-0': !zeroOpacity, 'opacity-100': zeroOpacity}"
         >
           <UiCircleProgress
@@ -142,7 +142,7 @@
         </div>
         <div
           v-if="attrVisible"
-          class="text-center transition-all duration-300"
+          class="text-center transition-all duration-300 inline-block col-span-2"
           :class="{'opacity-0': !zeroOpacity, 'opacity-100': zeroOpacity}"
         >
           <UiCircleProgress
