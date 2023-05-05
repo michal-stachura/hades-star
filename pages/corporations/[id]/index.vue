@@ -20,7 +20,7 @@
   const hSyncPopup = ref(false);
   const detailsVisible = ref(false);
   
-  const { corporation, currentCorporationId, loadingCorporation, getCorporationSecret, fetchCorporationData } = useCorporationDetails();
+  const { corporation, currentCorporationId, loadingCorporation, getCorporationSecret, fetchCorporationData, setMemberAttributeValue } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
   currentCorporationId.value = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
@@ -49,7 +49,8 @@
       );
       
       if (data.value) {
-        attribute.set = data.value.set
+        attribute = data.value
+        setMemberAttributeValue(clickedMember.value!.id, attribute)
         clickedMember.value = undefined
         clickedAttribute.value = undefined
         hideAllPopups()
@@ -133,9 +134,7 @@
           />
           <div class="grid grid-cols-1 gap-1 lg:flex">
             <div>
-              <CorporationsNextWsStats 
-                :members="corporation.members"
-              />
+              <CorporationsNextWsStats />
             </div>
             <div>
               <CorporationsFiltersCard />

@@ -1,7 +1,7 @@
 import { CorporationDetails } from '@/types/corporation';
 import { Member } from '@/types/member';
 import { Condition, Filter } from '@/types/filter';
-import { ShipAttribute } from '@/types/ship-attribute';
+import { Attribute, ShipAttribute } from '@/types/ship-attribute';
 import * as pkg from "vue-toastification"
 const { useToast } = pkg
 
@@ -61,8 +61,8 @@ function getCorporationLocalStorageData(id: string): any | null {
 
 function calculateAverageProgress(members: any[], keyName: string): number {
   const progressArray = members
-    .flatMap(member => member.attributes[keyName])
-    .map((item: any) => item.progress);
+  .flatMap(member => member.attributes[keyName])
+  .map((item: any) => item.progress);
   
   const sum = progressArray.reduce((a, b) => a + b, 0);
   const average = sum / progressArray.length;
@@ -116,6 +116,37 @@ const useCorporationDetails = () => {
       return corporation.value?.members?.reduce((counter, currObj) => wsStatuses.includes(currObj.nextWs) ? ++counter : counter, 0) || 0
     }
     return corporation.value?.members?.length || 0
+  }
+  
+  const corpPower = () => {
+    if (corporation.value && corporation.value.members) {
+      const weaponAverage = calculateAverageProgress(corporation.value.members, 'Weapon')
+      const shieldAverage = calculateAverageProgress(corporation.value.members, 'Shield')
+      const supportAverage = calculateAverageProgress(corporation.value.members, 'Support')
+      const miningAverage = calculateAverageProgress(corporation.value.members, 'Mining')
+      const tradeAverage = calculateAverageProgress(corporation.value.members, 'Trade')
+      const overallAverage = (weaponAverage + shieldAverage + tradeAverage + miningAverage + tradeAverage) / 5
+      return {
+        weapon: weaponAverage,
+        shield: shieldAverage,
+        support: supportAverage,
+        mining: miningAverage,
+        trade: tradeAverage,
+        overall: parseFloat(overallAverage.toFixed(2))
+      }
+    }
+
+    return 0
+  }
+
+  const setMemberAttributeValue = (userId: string, attribute: Attribute) => {
+    if (corporation.value?.members) {
+      const memberIdx = corporation.value.members.findIndex(obj => obj.id === userId)
+      const attributeGroupName = attributeGroup(attribute.name)
+      const attributeIdx = corporation.value.members[memberIdx].attributes[attributeGroupName].findIndex(obj => obj.id === attribute.id)
+      
+      corporation.value.members[memberIdx].attributes[attributeGroupName][attributeIdx] = attribute
+    }
   }
 
   const setWsStatus = (userId: string, status: string) => {
@@ -251,28 +282,6 @@ const useCorporationDetails = () => {
     }
   }
 
-  const corpPower = () => {
-    if (corporation.value) {
-      
-      const weaponAverage = calculateAverageProgress(corporation.value.members, 'Weapon')
-      const shieldAverage = calculateAverageProgress(corporation.value.members, 'Shield')
-      const supportAverage = calculateAverageProgress(corporation.value.members, 'Support')
-      const miningAverage = calculateAverageProgress(corporation.value.members, 'Mining')
-      const tradeAverage = calculateAverageProgress(corporation.value.members, 'Trade')
-      const overallAverage = (weaponAverage + shieldAverage + tradeAverage + miningAverage + tradeAverage) / 5
-      return {
-        weapon: weaponAverage,
-        shield: shieldAverage,
-        support: supportAverage,
-        mining: miningAverage,
-        trade: tradeAverage,
-        overall: parseFloat(overallAverage.toFixed(2))
-      }
-    }
-
-    return 0
-  }
-
   const sortMembersByName = () => {
     if (corporation.value && corporation.value.members) {
       // sort by name
@@ -316,6 +325,7 @@ const useCorporationDetails = () => {
     currentCorporationId,
     setCorporationDetails,
     setWsStatus,
+    setMemberAttributeValue,
     getWsStatus,
     countMembers,
     fetchCorporationData,
@@ -329,7 +339,7 @@ const useCorporationDetails = () => {
     filterMembersByTechLevel,
     addCorporationFilter,
     updateCorporationFilter,
-    corpPower,
+    corpPower
   }
 }
 
