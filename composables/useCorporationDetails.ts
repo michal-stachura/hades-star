@@ -1,4 +1,4 @@
-import { CorporationDetails } from '@/types/corporation';
+import { CorpPower, CorporationDetails } from '@/types/corporation';
 import { Member } from '@/types/member';
 import { Condition, Filter } from '@/types/filter';
 import { Attribute, ShipAttribute } from '@/types/ship-attribute';
@@ -118,25 +118,31 @@ const useCorporationDetails = () => {
     return corporation.value?.members?.length || 0
   }
   
-  const corpPower = () => {
-    if (corporation.value && corporation.value.members) {
-      const weaponAverage = calculateAverageProgress(corporation.value.members, 'Weapon')
-      const shieldAverage = calculateAverageProgress(corporation.value.members, 'Shield')
-      const supportAverage = calculateAverageProgress(corporation.value.members, 'Support')
-      const miningAverage = calculateAverageProgress(corporation.value.members, 'Mining')
-      const tradeAverage = calculateAverageProgress(corporation.value.members, 'Trade')
-      const overallAverage = (weaponAverage + shieldAverage + tradeAverage + miningAverage + tradeAverage) / 5
-      return {
-        weapon: weaponAverage,
-        shield: shieldAverage,
-        support: supportAverage,
-        mining: miningAverage,
-        trade: tradeAverage,
-        overall: parseFloat(overallAverage.toFixed(2))
-      }
-    }
+  const corpPower = (): CorpPower => {
+    let weaponAverage:number = 0
+    let shieldAverage: number = 0
+    let supportAverage: number = 0
+    let miningAverage: number = 0
+    let tradeAverage: number = 0
+    let overallAverage: number = 0
 
-    return 0
+    if (corporation.value && corporation.value.members) {
+      weaponAverage = calculateAverageProgress(corporation.value.members, 'Weapon')
+      shieldAverage = calculateAverageProgress(corporation.value.members, 'Shield')
+      supportAverage = calculateAverageProgress(corporation.value.members, 'Support')
+      miningAverage = calculateAverageProgress(corporation.value.members, 'Mining')
+      tradeAverage = calculateAverageProgress(corporation.value.members, 'Trade')
+      overallAverage = (weaponAverage + shieldAverage + supportAverage + tradeAverage + miningAverage) / 5
+      overallAverage = parseFloat(overallAverage.toFixed(2))
+    }
+    return {
+      weapon: weaponAverage,
+      shield: shieldAverage,
+      support: supportAverage,
+      mining: miningAverage,
+      trade: tradeAverage,
+      overall: overallAverage
+    }
   }
 
   const setMemberAttributeValue = (userId: string, attribute: Attribute) => {

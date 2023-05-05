@@ -139,7 +139,7 @@
             <div>
               <CorporationsFiltersCard />
             </div>
-            <div>
+            <div class="grow items-end justify-end">
               <CorporationsPowerChart />
             </div>
           </div>
