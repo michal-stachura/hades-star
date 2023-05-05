@@ -1,7 +1,7 @@
-import { CorporationDetails } from '@/types/corporation';
+import { CorpPower, CorporationDetails } from '@/types/corporation';
 import { Member } from '@/types/member';
 import { Condition, Filter } from '@/types/filter';
-import { ShipAttribute } from '@/types/ship-attribute';
+import { Attribute, ShipAttribute } from '@/types/ship-attribute';
 import * as pkg from "vue-toastification"
 const { useToast } = pkg
 
@@ -59,6 +59,17 @@ function getCorporationLocalStorageData(id: string): any | null {
   return null
 }
 
+function calculateAverageProgress(members: any[], keyName: string): number {
+  const progressArray = members
+  .flatMap(member => member.attributes[keyName])
+  .map((item: any) => item.progress);
+  
+  const sum = progressArray.reduce((a, b) => a + b, 0);
+  const average = sum / progressArray.length;
+  
+  return parseFloat(average.toFixed(2));
+}
+
 const useCorporationDetails = () => {
   const corporation = useState<CorporationDetails | null>('corporation');
   const loadingCorporation = useState<boolean>('loadingCorporation', () => true);
@@ -105,6 +116,43 @@ const useCorporationDetails = () => {
       return corporation.value?.members?.reduce((counter, currObj) => wsStatuses.includes(currObj.nextWs) ? ++counter : counter, 0) || 0
     }
     return corporation.value?.members?.length || 0
+  }
+  
+  const corpPower = (): CorpPower => {
+    let weaponAverage:number = 0
+    let shieldAverage: number = 0
+    let supportAverage: number = 0
+    let miningAverage: number = 0
+    let tradeAverage: number = 0
+    let overallAverage: number = 0
+
+    if (corporation.value && corporation.value.members) {
+      weaponAverage = calculateAverageProgress(corporation.value.members, 'Weapon')
+      shieldAverage = calculateAverageProgress(corporation.value.members, 'Shield')
+      supportAverage = calculateAverageProgress(corporation.value.members, 'Support')
+      miningAverage = calculateAverageProgress(corporation.value.members, 'Mining')
+      tradeAverage = calculateAverageProgress(corporation.value.members, 'Trade')
+      overallAverage = (weaponAverage + shieldAverage + supportAverage + tradeAverage + miningAverage) / 5
+      overallAverage = parseFloat(overallAverage.toFixed(2))
+    }
+    return {
+      weapon: weaponAverage,
+      shield: shieldAverage,
+      support: supportAverage,
+      mining: miningAverage,
+      trade: tradeAverage,
+      overall: overallAverage
+    }
+  }
+
+  const setMemberAttributeValue = (userId: string, attribute: Attribute) => {
+    if (corporation.value?.members) {
+      const memberIdx = corporation.value.members.findIndex(obj => obj.id === userId)
+      const attributeGroupName = attributeGroup(attribute.name)
+      const attributeIdx = corporation.value.members[memberIdx].attributes[attributeGroupName].findIndex(obj => obj.id === attribute.id)
+      
+      corporation.value.members[memberIdx].attributes[attributeGroupName][attributeIdx] = attribute
+    }
   }
 
   const setWsStatus = (userId: string, status: string) => {
@@ -283,6 +331,7 @@ const useCorporationDetails = () => {
     currentCorporationId,
     setCorporationDetails,
     setWsStatus,
+    setMemberAttributeValue,
     getWsStatus,
     countMembers,
     fetchCorporationData,
@@ -295,7 +344,8 @@ const useCorporationDetails = () => {
     hideMembersWithWsStatus,
     filterMembersByTechLevel,
     addCorporationFilter,
-    updateCorporationFilter
+    updateCorporationFilter,
+    corpPower
   }
 }
 

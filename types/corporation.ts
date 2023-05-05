@@ -17,3 +17,12 @@ export interface CorporationDetails extends Corporation {
   members: Array<Member>;
   filters: Array<Filter>;
 }
+
+export interface CorpPower {
+  weapon: number;
+  shield: number;
+  support: number;
+  mining: number;
+  trade: number;
+  overall: number;
+}
