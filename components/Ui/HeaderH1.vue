@@ -18,7 +18,7 @@ const redirectBack = (url: string | undefined): void => {
 </script>
 
 <template>
-  <h1 class="pb-4 text-2xl font-semibold text-gray-200">
+  <h1 class="text-2xl font-semibold text-gray-200">
     <font-awesome-icon
       v-if="navBack"
       icon="fa-duotone fa-square-arrow-left"

@@ -24,10 +24,56 @@
       Add your corporation and share details with your colleagues. Plan White Star battles, update corporation stats and many more.
     </UiParagraph>
     <UiDivider />
+    <UiCard
+      :header="true"
+      class="mb-2"
+    >
+      <template #header>
+        <UiHeaderH1>Release history</UiHeaderH1>
+      </template>
+      <UiHeaderH2 class="mb-2">
+        2023-05-06 <small>v. 1.2</small>
+      </UiHeaderH2>
+      <UiParagraph>
+        <strong>Features</strong>
+        <UiUl 
+          :list="[
+            'Filtering members by its next WS status',
+            'Filtering members by its tech level + filters management',
+            'Sync corporation data with HadesStar Compendium app',
+            'Display Members current time depending on members timezone',
+            'Power corp component with corporation percentage progress in tech levels'
+          ]"
+        />
+        <strong>Bug Fixes</strong>
+        <UiUl 
+          :list="[
+            'Move corp fetching data to composables',
+            'Better LocalStorage app object'
+          ]"
+        />
+      </UiParagraph>
+      <UiHeaderH2 class="mb-2">
+        2023-02-13 <small>v. 1.1</small>
+      </UiHeaderH2>
+      <UiParagraph>
+        <strong>Features</strong>
+        <UiUl 
+          :list="[
+            'Build base app scheleton',
+            'Prepared mechanism to secure the date of Corporations',
+            'Base Corp functionalities',
+            [
+              'Managing corporation data',
+              'Managing members + their attributes',
+              ['aaa', 'sss']
+            ]
+          ]"
+        />
+      </UiParagraph>
+    </UiCard>
     <UiCard>
       <UiInfo>
-        This is the early stage of this service.
-        <UiParagraph class="mt-4">
           If you have any ideas for new functionalities please contact me at:
           <span
             class="underline cursor-pointer"
@@ -44,12 +90,12 @@
             :text="'Copied'"
             class="float-right mr-0 mt-1"
           />
-        </UiParagraph>
+        
       </UiInfo>
     </UiCard>
 
     <UiFooter>
-      <UiBadge :text="'App version 1.1'" />
+      <UiBadge :text="'App version 1.2'" />
     </UiFooter>
   </div>
 </template>
