@@ -38,6 +38,13 @@
         <strong>Features</strong>
         <UiUl 
           :list="[
+            'aaa',
+            'bbb',
+            'ccc'
+          ]"
+        />
+        <UiUl 
+          :list="[
             'Filtering members by its next WS status',
             'Filtering members by its tech level + filters management',
             'Sync corporation data with HadesStar Compendium app',

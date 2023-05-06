@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { PropType } from 'vue';
+  import { PropType, h } from 'vue';
   type ListItem = string | ListItem[];
 
   const props = defineProps({
@@ -14,20 +14,25 @@
     }
   })
 
-  function CreateItem(item) {
+  function CreateItem(item: ListItem): string {
     if (typeof item === 'string') {
-      
+      return `<li>${item}</li>`;
+    } else if (Array.isArray(item)) {
+      return CreateList(item);
+    } else {
+      throw new Error(`Invalid list item: ${item}`);
     }
+
+  }
+  function CreateList(list: ListItem[]): string {
+    return `<ul>
+      ${list.map((item) => CreateItem(item))}
+    </ul>`
   }
 </script>
 
 <template>
-  <ul class="my-4 ml-2 text-left">
-    <li class="flex items-center space-x-3"
-      v-for="item in list"
-    >
-      <font-awesome-icon :icon="['fad', props.iconName]" />
-      <span>{{ item }}</span>
-    </li>   
-  </ul>  
+  <div>
+    <span v-html="CreateList(list)"></span>
+  </div>
 </template>
