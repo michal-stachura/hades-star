@@ -2,10 +2,6 @@
   import * as pkg from "vue-toastification";
   import { HSCMember } from "@/types/hscmember";
   import { CorporationDetails } from '@/types/corporation';
-  interface HSCSyncResponse {
-    meta?: Object;
-    data?: HSCMember[];
-  }
   const { useToast } = pkg;
 
   const { corporation, currentCorporationId, getCorporationSecret, setCorporationDetails } = useCorporationDetails();
@@ -16,6 +12,7 @@
   const filteredMembers = ref<HSCMember[]>([]);
   const selectedMembers = ref<HSCMember[]>([]);
   const filteredMemberName = ref<string>('');
+  const videoPlayer = ref<HTMLVideoElement | null>(null)
 
   async function syncMembers() {
     if (sendRequest.value) return;
@@ -137,15 +134,40 @@
     <UiInfo v-if="corporation && !corporation.roleId">
       Before you can import data you must provide your corporation server ID. You can find it in your corp Discord.<br />
       <video
-        class="mx-auto p-2 border border-gray-600 rounded"
-        width="325" height="691" autoplay muted loop>
+        ref="videoPlayer"
+        class="mx-auto p-2 border border-gray-600 rounded mb-1"
+        width="972" height="578" muted>
         <source
-        :src="`${config.imagesUrl}/videos/copy-server.id.webm`" type="video/webm"
+        :src="`${config.imagesUrl}/videos/copy-role-id.mp4`" type="video/mp4"
         >
         Your browser does not support the video tag.
       </video> 
+      <div
+        v-if="videoPlayer"
+      >
+        <UiButton
+          @click="videoPlayer.play();"
+          :text="'Play'"
+          :layout="'transparent'"
+          :size="'sm'"
+          class="mr-1"
+        />
+        <UiButton
+          @click="videoPlayer.pause();"
+          :text="'Pause'"
+          :layout="'transparent'"
+          :size="'sm'"
+          class="mr-1"
+        />
+        <UiButton
+          @click="videoPlayer.pause(); videoPlayer.currentTime = 0;"
+          :text="'Restart'"
+          :layout="'transparent'"
+          :size="'sm'"
+        />
+      </div>
       <div class="text-center">
-        <em class="my-2 block">"Right" click on your corporation in Discord and click Copy Server ID at the bottom.</em>
+        <em class="my-2 block">Select your Corp role Id and copy/paste it to this app.</em>
         <UiButton
           :text="'Edit Corporation'"
           class="mx-auto"

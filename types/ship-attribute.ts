@@ -4,7 +4,7 @@ export interface Attribute {
   set: number,
   max: number,
   type?: string,
-  progress: number,
+  progress?: number,
 }
 
 export interface ShipAttribute {

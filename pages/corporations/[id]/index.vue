@@ -114,6 +114,7 @@
             <div class="grow">
               <UiHeaderH1
                 :nav-back="'/corporations'"
+                class="mb-4"
               >
                 {{ corporation.name }}
               </UiHeaderH1>
@@ -199,7 +200,9 @@
             <div class="flex overflow-x-scroll w-full ml-2">
               <div class="min-w-fit flex">
                 <div>
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Weapons
                   </UiHeaderH2>
                   <div>
@@ -229,7 +232,9 @@
                   </div>
                 </div>
                 <div class="ml-2">
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Shields
                   </UiHeaderH2>
                   <div>
@@ -259,7 +264,9 @@
                   </div>
                 </div>
                 <div class="ml-2">
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Support
                   </UiHeaderH2>
                   <div>
@@ -289,7 +296,9 @@
                   </div>
                 </div>
                 <div class="ml-2">
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Mining
                   </UiHeaderH2>
                   <div>
@@ -319,7 +328,9 @@
                   </div>
                 </div>
                 <div class="ml-2">
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Trade
                   </UiHeaderH2>
                   <div>

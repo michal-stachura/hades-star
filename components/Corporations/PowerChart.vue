@@ -71,7 +71,7 @@
       </div>
       <div
         class="grid grid-cols-6 lg:flex transition-all duration-300"
-        :class="{'w-0': !showDetails, 'w-[350px] lg:w-[400px]': showDetails}"
+        :class="{'w-0': !showDetails, 'w-full lg:w-[400px]': showDetails}"
       >
         <div
           v-if="attrVisible"

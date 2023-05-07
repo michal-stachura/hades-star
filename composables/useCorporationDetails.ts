@@ -65,7 +65,7 @@ function calculateAverageProgress(members: any[], keyName: string): number {
   .map((item: any) => item.progress);
   
   const sum = progressArray.reduce((a, b) => a + b, 0);
-  const average = sum / progressArray.length;
+  const average = sum / progressArray.length || 0;
   
   return parseFloat(average.toFixed(2));
 }
