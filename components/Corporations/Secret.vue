@@ -31,7 +31,7 @@
   const config = useRuntimeConfig();
   
 
-  async function checkSecret(secret: String) {
+  async function checkSecret(secret: string) {
     if (sendRequest.value) {
       return
     }
@@ -52,7 +52,7 @@
     sendRequest.value = pending.value
   }
 
-  async function setSecret(secret: String) {
+  async function setSecret(secret: string) {
     if (sendRequest.value) {
       return;
     }

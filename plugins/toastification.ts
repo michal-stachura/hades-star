@@ -1,5 +1,6 @@
-import Toast from "vue-toastification"
-import "vue-toastification/dist/index.css"
+// @ts-ignore
+import Toast from "vue-toastification/dist/index.mjs";
+import "vue-toastification/dist/index.css";
 
 export default defineNuxtPlugin(nuxtApp => {
   nuxtApp.vueApp.use(Toast)

@@ -37,7 +37,7 @@
         method: 'PATCH',
         body: {
           nextWs: status,
-          corporationId: props.corporationId,
+          corporation: props.corporationId,
         },
         headers: [
           ['Corporation-Secret', getCorporationSecret(props.corporationId)]
@@ -63,7 +63,7 @@
 <template>
   <div class="relative">
     <UiCard
-      class="w-10 text-center mx-auto cursor-pointer"
+      class="w-10 text-center mx-auto cursor-pointer mb-1"
       @click="showNextScanButtons = !showNextScanButtons"
     >
       <span v-if="!sendRequest">

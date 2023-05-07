@@ -1,16 +1,13 @@
 <script setup lang="ts">
-  import { CorporationDetails } from '@/types/corporation';
   import { Member } from '@/types/member';
   import { Attribute } from '@/types/ship-attribute';
   import * as pkg from "vue-toastification"
   const { useToast } = pkg
-
+  
 
   const route = useRoute();
   const config = useRuntimeConfig();
-  const isLoading = ref(true);
   const sendRequest = ref(false);
-  const incorrectSecret = ref(false);
   const editMember = ref(false);
   const clickedMember = ref<Member | null>();
   const clickedAttribute = ref<Attribute | null>();
@@ -19,36 +16,16 @@
   const memberDetailsPopup = ref(false);
   const memberAttributePopup = ref(false);
   const editCorporationPopup = ref(false);
+  const showMembersTime = ref(false);
+  const hSyncPopup = ref(false);
   const detailsVisible = ref(false);
   
-  const { corporation, getCorporationSecret, setCorporationDetails } = useCorporationDetails();
+  const { corporation, currentCorporationId, loadingCorporation, getCorporationSecret, fetchCorporationData, setMemberAttributeValue } = useCorporationDetails();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
-  const corporationId: string = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
+  currentCorporationId.value = typeof(route.params.id) === 'string' ? route.params.id : route.params.id[0]
 
-  async function fetchCorporationData() {
-    corporation.value = null;
-    
-    await fetch(
-      `${config.apiBaseUrl}/corporations/${route.params.id}/`,
-      {
-        headers: [['Corporation-Secret', getCorporationSecret(corporationId)]],
-      }
-    ).then((response) => {
-      if (response.ok) {
-        return response.json()
-      }
-      return Promise.reject(response);
-    }).then((responseJson) => {
-      setCorporationDetails(responseJson as CorporationDetails)
-      isLoading.value = false;
-      incorrectSecret.value = false;
-    }).catch((error) => {
-      useToast().error(`${error.status} - ${error.statusText}`)
-      isLoading.value = false;
-      incorrectSecret.value = true;
-    })
-  }
-
+  fetchCorporationData(currentCorporationId.value);
+  
   async function setAttributeLevel(attribute: Attribute, level:Number) {
       if (sendRequest.value) {
         return
@@ -61,21 +38,23 @@
           method: 'PATCH',
           body: {
             attributeId: attribute.id,
-            value: level,
+            set: level,
             attributeName: attribute.name,
-            corporationId: route.params.id,
+            corporation: currentCorporationId.value,
           },
           headers: [
-            ['Corporation-Secret', getCorporationSecret(corporationId)]
+            ['Corporation-Secret', getCorporationSecret(currentCorporationId.value)]
           ],
         }
       );
       
       if (data.value) {
-        attribute.value = data.value.value
+        attribute = data.value
+        setMemberAttributeValue(clickedMember.value!.id, attribute)
         clickedMember.value = undefined
         clickedAttribute.value = undefined
-        popupToggleVisibility()
+        hideAllPopups()
+        useToast().success('Updated successfully')
       }
       if (error.value) {
         if (error.value.response) {
@@ -92,6 +71,7 @@
     memberDetailsPopup.value = false;
     memberAttributePopup.value = false;
     editCorporationPopup.value = false;
+    hSyncPopup.value = false;
     popupToggleVisibility();
   }
 
@@ -108,34 +88,33 @@
     popupToggleVisibility()
   }
 
+  function showHsyncPopup(): void {
+    hSyncPopup.value = true;
+    popupToggleVisibility();
+  }
+
   const attributeButtonLayout = (currentValue: Number, attributeValue: Number) => {
     return currentValue === attributeValue ? '' : 'transparent'
   }
 
-  fetchCorporationData();
+  
 </script>
 
 <template>
   <div>
-    <div v-if="isLoading">
+    <div v-if="loadingCorporation">
       <UiCard>
-        Fetching data...
+        <UiLoader /> Fetching data...
       </UiCard>
     </div>
     <div v-else>
-      <div v-if="incorrectSecret">
-        <CorporationsSecret
-          :goBackBtn="true"
-          :corporationId="route.params.id.toString()"
-          @corporation-secret-change="fetchCorporationData()"
-        />
-      </div>
-      <div v-else>
+      <div>
         <div v-if="corporation">
           <div class="flex">
             <div class="grow">
               <UiHeaderH1
                 :nav-back="'/corporations'"
+                class="mb-4"
               >
                 {{ corporation.name }}
               </UiHeaderH1>
@@ -148,33 +127,57 @@
               />
             </div>
           </div>
-          <UiDivider />
           <CorporationsDetails 
-            :corporation="corporation"
             class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out"
-            :class="{'max-h-[24rem]': detailsVisible}"
+            :class="{'max-h-[28rem]': detailsVisible}"
+            :corporation="corporation"
+            @h-sync="showHsyncPopup()"
           />
-          <CorporationsNextWsStats 
-            :members="corporation.members"
-          />
+          <div class="grid grid-cols-1 gap-1 lg:flex">
+            <div>
+              <CorporationsNextWsStats />
+            </div>
+            <div>
+              <CorporationsFiltersCard />
+            </div>
+            <div class="grow items-end justify-end">
+              <CorporationsPowerChart />
+            </div>
+          </div>
           <div
             v-if="corporation.members && corporation.members.length > 0"
             class="flex mt-2">
             <div class="max-w-fit min-w-fit">
               <UiHeaderH2
-                class="mb-14 pb-1"
+                class="mb-6 pb-1"
               >
                 Username
               </UiHeaderH2>
-              <UiCard
+              <UiButton 
+                :text="'Show Time'"
+                :layout="showMembersTime ? '': 'transparent'"
+                :size="'sm'"
+                class="mb-1"
+                @click="showMembersTime = !showMembersTime"
+              />
+              <span
                 v-for="member in corporation.members"
                 :key="member.id"
-                @click="showMemberDetails(member)"
-                class="cursor-pointer"
-                v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
               >
-                {{ member.name }}
-              </UiCard>
+                <UiCard
+                  v-if="member.isVisible"
+                  @click="showMemberDetails(member)"
+                  class="cursor-pointer relative mb-1"
+                  :class="{'border-l-4 border-blue-500': member.hscId}"
+                  v-tooltip.right="{content: 'Click for member details', delay: {show: 1000, hide: 0}}"
+                >
+                  {{ member.name }}
+                  <MembersCurrentTime
+                    v-if="showMembersTime"
+                    :member-timezone="member.timeZone"
+                  />
+                </UiCard>
+              </span>
             </div>
             <div class="ml-2 min-w-fit">
               <UiHeaderH2
@@ -182,24 +185,31 @@
               >
                 Next scan
               </UiHeaderH2>
-              <CorporationsNextWs
+              <span
                 v-for="member in corporation.members"
-                :member="member"
-                :corporationId="corporationId"
-                :key="`nextWS_${member.id}`"
-              />
+                :key="member.id"
+              >
+                <CorporationsNextWs
+                  v-if="member.isVisible"
+                  :member="member"
+                  :corporationId="currentCorporationId"
+                  :key="`nextWS_${member.id}`"
+                />
+              </span>
             </div>
             <div class="flex overflow-x-scroll w-full ml-2">
               <div class="min-w-fit flex">
                 <div>
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Weapons
                   </UiHeaderH2>
                   <div>
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.weapon"
+                        v-for="attribute in corporation.members[0].attributes.Weapon"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -211,8 +221,8 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
-                        v-for="attribute in member.attributes.weapon"
+                        v-if="member.attributes && member.isVisible"
+                        v-for="attribute in member.attributes.Weapon"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"
@@ -222,14 +232,16 @@
                   </div>
                 </div>
                 <div class="ml-2">
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Shields
                   </UiHeaderH2>
                   <div>
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.shield"
+                        v-for="attribute in corporation.members[0].attributes.Shield"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -241,8 +253,8 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
-                        v-for="attribute in member.attributes.shield"
+                        v-if="member.attributes && member.isVisible"
+                        v-for="attribute in member.attributes.Shield"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"
@@ -252,14 +264,16 @@
                   </div>
                 </div>
                 <div class="ml-2">
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Support
                   </UiHeaderH2>
                   <div>
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.support"
+                        v-for="attribute in corporation.members[0].attributes.Support"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -271,8 +285,8 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
-                        v-for="attribute in member.attributes.support"
+                        v-if="member.attributes && member.isVisible"
+                        v-for="attribute in member.attributes.Support"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"
@@ -282,14 +296,16 @@
                   </div>
                 </div>
                 <div class="ml-2">
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Mining
                   </UiHeaderH2>
                   <div>
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.mining"
+                        v-for="attribute in corporation.members[0].attributes.Mining"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -301,8 +317,8 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
-                        v-for="attribute in member.attributes.mining"
+                        v-if="member.attributes && member.isVisible"
+                        v-for="attribute in member.attributes.Mining"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"
@@ -312,14 +328,16 @@
                   </div>
                 </div>
                 <div class="ml-2">
-                  <UiHeaderH2>
+                  <UiHeaderH2
+                    class="mb-4"
+                  >
                     Trade
                   </UiHeaderH2>
                   <div>
                     <div class="flex">
                       <MembersAttributeCard
                         v-if="corporation.members && corporation.members.length > 0 && corporation.members[0].attributes"
-                        v-for="attribute in corporation.members[0].attributes.trade"
+                        v-for="attribute in corporation.members[0].attributes.Trade"
                         :key="attribute.name"
                         :attribute="attribute"
                         :iconsOnly="true"
@@ -331,8 +349,8 @@
                       class="flex w-full"
                     >
                       <MembersAttributeCard
-                        v-if="member.attributes"
-                        v-for="attribute in member.attributes.trade"
+                        v-if="member.attributes && member.isVisible"
+                        v-for="attribute in member.attributes.Trade"
                         :key="attribute.name"
                         :attribute="attribute"
                         class="cursor-pointer"
@@ -352,7 +370,16 @@
               <UiParagraph>No members yet. Please add first member</UiParagraph>
               <UiButton 
                 :text="'Add Member'"
+                :size="'sm'"
+                :layout="'transparent'"
+                class="mr-2"
                 @click="addMemberPopup = true; popupToggleVisibility()"
+              />
+              <UiButton
+                :text="'Sync data with HS Compendium'"
+                :size="'sm'"
+                :layout="'transparent'"
+                @click="showHsyncPopup()"
               />
             </UiCard>
           </div>
@@ -380,21 +407,6 @@
             />
           </UiFooter>
         </div>
-        <div v-else>
-          <UiCard>
-            Error fetching data. Please try again.
-          </UiCard>
-          <UiButton 
-            :text="'Refresh'"
-            class="ml-2"
-            @click="fetchCorporationData()"
-          />
-          <UiButton 
-            :text="'Go back'"
-            class="ml-2"
-            @click="navigateTo('/corporations')"
-          />
-        </div>
       </div>
     </div>
 
@@ -405,7 +417,7 @@
         >
           <div class="p-4">
             <CorporationsEdit
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               @close-popup="hideAllPopups();"
             />
           </div>
@@ -419,7 +431,7 @@
           @close-popup="hideAllPopups()"
         >
           <MembersAdd
-            :corporationId="corporationId"
+            :corporationId.value="currentCorporationId"
             @cancel-add-member="hideAllPopups();"
             @sucess-add-member="hideAllPopups();"
           />
@@ -434,7 +446,7 @@
         >
           <div class="p-4">
             <CorporationsSecret
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               :goBackBtn="false"
               :cancelBtn="true"
               :setNewSecret="true"
@@ -446,7 +458,7 @@
       </Teleport>
     </ClientOnly>
 
-    <ClientOnly v-if="isPopupVisible && memberDetailsPopup">
+    <ClientOnly v-if="isPopupVisible && memberDetailsPopup && clickedMember">
       <Teleport to="#popup-container">
         <UiPopup
           @close-popup="hideAllPopups()"
@@ -454,7 +466,7 @@
           <div v-if="!editMember" class="p-4">
             <MembersDetails
               :member="clickedMember"
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               @edit-member="editMember = true"
               @success-delete-member="hideAllPopups();"
             />
@@ -465,7 +477,7 @@
           >
             <MembersEdit
               :member="clickedMember"
-              :corporationId="corporationId"
+              :corporationId.value="currentCorporationId"
               @cancel-edit-member="hideAllPopups();"
               @success-edit-member="hideAllPopups();"
             />
@@ -479,7 +491,9 @@
         <UiPopup
           @close-popup="hideAllPopups()"
         >
-          <div class="p-4">
+          <div
+            v-if="clickedAttribute"
+            class="p-4">
             <UiHeaderH2>{{ $reslugify(clickedAttribute.name) }}</UiHeaderH2>
             <UiDivider />
             <div class="text-center">
@@ -490,7 +504,7 @@
               <UiButton 
                 class="m-1"
                 :text="'0'"
-                :layout="attributeButtonLayout(0, clickedAttribute.value)"
+                :layout="attributeButtonLayout(0, clickedAttribute.set)"
                 @click="setAttributeLevel(clickedAttribute!,  0)"
               />
               <UiButton 
@@ -498,11 +512,28 @@
                 class="m-1"
                 :key="idx"
                 :text="`${idx}`"
-                :layout="attributeButtonLayout(idx, clickedAttribute.value)"
+                :layout="attributeButtonLayout(idx, clickedAttribute.set)"
                 @click="setAttributeLevel(clickedAttribute!,  idx)"
               />
             </div>
           </div>
+        </UiPopup>
+      </Teleport>
+    </ClientOnly>
+
+    <ClientOnly
+      v-if="isPopupVisible && hSyncPopup"
+    >
+      <Teleport to="#popup-container">
+        <UiPopup
+          :header="'HS Compendium Data Sync'"
+          @close-popup="hideAllPopups()"
+        >
+          <CorporationsHSync 
+            :corporationId.value="currentCorporationId"
+            @edit-corporation="hideAllPopups(); editCorporationPopup = true; popupToggleVisibility()"
+            @close-popup="hideAllPopups()"
+          />
         </UiPopup>
       </Teleport>
     </ClientOnly>

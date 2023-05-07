@@ -21,7 +21,8 @@
     flagShip: corporation.value!.flagShip,
     requiredInfluence: corporation.value!.requiredInfluence,
     wsWins: corporation.value!.wsWins,
-    discord: corporation.value!.discord
+    discord: corporation.value!.discord,
+    roleId: corporation.value!.roleId
   })
   const sendRequest = ref(false);
 
@@ -48,7 +49,7 @@
       emit('closePopup');
     }
     
-    if (error.value) {
+    if (error.value && error.value.response) {
       useToast().error(`${error.value.response.status} - ${error.value.data.detail}`)
     }
     
@@ -211,6 +212,12 @@
       :name="'Discord'"
       :value="corporationForm.discord"
       :label="'Discord'"
+    />
+    <UiInputText
+      v-model="corporationForm.roleId"
+      :name="'RoleID'"
+      :value="corporationForm.roleId"
+      :label="'Role ID'"
     />
     <UiButton
       :text="'Submit'"

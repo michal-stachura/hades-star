@@ -9,7 +9,7 @@
 </script>
 
 <template>
-  <span class="bg-white/10 rounded-full py-1 px-3 text-gray-200 text-xs mr-2">
+  <span class="bg-white/10 rounded-full py-1 px-3 text-gray-200 text-xs mr-1 mb-1 inline-block">
     {{ text }}
   </span>
 </template>
