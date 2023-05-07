@@ -39,7 +39,9 @@
 
 <template>
   <div>
-    <UiHeaderH1>Corp list</UiHeaderH1>
+    <UiHeaderH1
+      class="mb-4"
+    >Corp list</UiHeaderH1>
     <UiCard v-if="error">
       {{ error }}
     </UiCard>

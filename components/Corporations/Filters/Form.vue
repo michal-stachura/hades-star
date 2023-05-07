@@ -243,7 +243,7 @@
                   <UiCard
                     :class="'rounded-full w-20 h-20 flex items-center justify-center'"
                   >
-                    <UiHeaderH1 :class="'mt-4 mx-4'">{{ attribute.set }}</UiHeaderH1>
+                    <UiHeaderH1>{{ attribute.set }}</UiHeaderH1>
                   </UiCard>
                 </div>
                 <div class="flex items-center">
@@ -259,14 +259,14 @@
                 :text="'equal'"
                 :size="'sm'"
                 :layout="attribute.type === 'equal' ? '': 'transparent'"
-                :class="'mr-2'"
+                :class="'mr-2 mb-1'"
                 @click="setAttributeValueType(attribute, 'equal')"
               />
               <UiButton
                 :text="'lower or equal'"
                 :size="'sm'"
                 :layout="attribute.type === 'lower' ? '': 'transparent'"
-                :class="'mr-2'"
+                :class="'mr-2 mb-1'"
                 @click="setAttributeValueType(attribute, 'lower')"
               />
               <UiButton

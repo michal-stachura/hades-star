@@ -35,10 +35,14 @@
 
 <template>
   <div>
-    <UiCard>
-      <UiHeaderH2>
-        <font-awesome-icon icon="fa-duotone fa-filter-list" class="mr-1"/> Filters
-      </UiHeaderH2>
+    <UiCard
+      :header="true"
+    >
+      <template #header>
+        <UiHeaderH2>
+          <font-awesome-icon icon="fa-duotone fa-filter-list" class="mr-1"/> Filters
+        </UiHeaderH2>
+      </template>
       <span 
         v-if="corporation"
       >
@@ -48,7 +52,7 @@
           :text="filter.name.toString()"
           :size="'sm'"
           :layout="clickedFilter === filter.id ? '' : 'transparent'"
-          :class="'mr-2 mb-2'"
+          :class="'mr-2 my-1'"
           @click="toggleFilter(filter.id)"
         />
     </span>
@@ -56,6 +60,7 @@
         :text="'Manage filters'"
         :size="'sm'"
         @click="navigateTo(`/corporations/${route.params.id}/filters`)"
+        class="my-1"
       />
     </UiCard>
   </div>
