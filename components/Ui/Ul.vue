@@ -6,11 +6,6 @@
     list: {
       required: true,
       type: Array as PropType<ListItem[]>
-    },
-    iconName: {
-      required: false,
-      type: String as PropType<string>,
-      default: 'square-star'
     }
   })
 
@@ -25,9 +20,9 @@
 
   }
   function CreateList(list: ListItem[]): string {
-    return `<ul>
-      ${list.map((item) => CreateItem(item))}
-    </ul>`
+    return `<ul class="my-1 ml-6 list-disc">
+      ${list.map((item) => CreateItem(item)).join('')}
+    </ul>`;
   }
 </script>
 
