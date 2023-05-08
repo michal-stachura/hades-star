@@ -120,9 +120,22 @@
               </UiHeaderH1>
             </div>
             <div class="grow-0">
-              <font-awesome-icon
-                class="cursor-pointer float-right ml-1 text-3xl text-gray-200"
-                icon="fa-duotone fa-circle-info"
+              <NuxtLink
+                :to="`/corporations/${currentCorporationId}/ws-logs`"
+              >
+                <UiButton
+                  :text="'WS Logs'"
+                  :icon="['fad', 'star-shooting']"
+                  :layout="'transparent'"
+                  :size="'sm'"
+                  class="mr-1"
+                />
+              </NuxtLink>
+              <UiButton 
+                :text="'Settings'"
+                :icon="['fad', 'sliders']"
+                :layout="detailsVisible ? 'defult' : 'transparent'"
+                :size="'sm'"
                 @click="detailsVisible = !detailsVisible"
               />
             </div>

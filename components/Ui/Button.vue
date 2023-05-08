@@ -12,6 +12,11 @@
       type: String,
       required: true
     },
+    icon: {
+      type: Array as PropType<String[]> | null,
+      required: false,
+      default: null,
+    },
     size: {
       type: String,
       required: false,
@@ -63,7 +68,13 @@
     :type="props.type"
     :disabled="props.disabled"
   >
-    <span v-html="props.text"></span>
+      <span v-html="props.text"></span>
+      <span
+        v-if="props.icon"
+        class="ml-1"
+      >
+        <font-awesome-icon :icon="props.icon" />
+      </span>
   </button>
 </template>
 

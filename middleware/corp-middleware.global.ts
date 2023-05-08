@@ -2,7 +2,8 @@ export default defineNuxtRouteMiddleware((to, from) => {
   const { currentCorporationId, incorrectSecret } = useCorporationDetails();
   const pageNames: string[] = [
     'corporations-id',
-    'corporations-id-filters'
+    'corporations-id-filters',
+    'corporations-id-ws-logs'
   ]
   
   if (pageNames.includes(to.name as string)) {
