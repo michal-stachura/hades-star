@@ -2,19 +2,81 @@
   // @ts-ignore
   import useCorporationDetails  from '@/composables/useCorporationDetails';
 
+  type matchFormReactiveForm = {
+    matchType: number,
+  }
+
   const { corporation, currentCorporationId, fetchCorporationData } = useCorporationDetails();
+  const { isPopupVisible, popupToggleVisibility } = usePopup();
+
+  const newMatchPopupVisible = ref<boolean>(false)
+  const addMatchFormStep = ref<number>(1)
+  const wsMatchForm = reactive<matchFormReactiveForm>(
+    {
+      matchType: 5
+    }
+  )
+
 
   fetchCorporationData(currentCorporationId.value);
+
+  function toggleAddMatchForm():void {
+    addMatchFormStep.value = 1; 
+    newMatchPopupVisible.value = !newMatchPopupVisible.value;
+    popupToggleVisibility();
+
+  }
+
+  function hideAllPopups(): void {
+    newMatchPopupVisible.value = false;
+    popupToggleVisibility();
+  }
+
+  function setMatchType(matchType:number):void {
+    console.log(matchType)
+
+    addMatchFormStep.value = 2
+  }
 </script>
 
 <template>
   <div v-if="corporation">
-    <UiHeaderH1
-      :nav-back="`/corporations/${currentCorporationId}`"
-      >
-      {{ corporation.name }} White Star Logs {{ currentCorporationId }}
-    </UiHeaderH1>
+    <div class="flex">
+      <div class="grow">
+        <UiHeaderH1
+          :nav-back="`/corporations/${currentCorporationId}`"
+          class="mb-4"
+          >
+          {{ corporation.name }} White Star Logs
+        </UiHeaderH1>
+      </div>
+      <div class="grow-0">
+        <UiButton 
+          :text="'Add match'"
+          :icon="['fad', 'plus']"
+          :layout="'transparent'"
+          :size="'sm'"
+          @click="toggleAddMatchForm()"
+        />
+      </div>
+    </div>
     
-    <UiParagraph>{{ currentCorporationId }}</UiParagraph>
+    <UiHeaderH2>TODO: Add list of already played matches</UiHeaderH2>
   </div>
+
+  <ClientOnly v-if="isPopupVisible && newMatchPopupVisible">
+      <Teleport to="#popup-container">
+        <UiPopup
+          @close-popup="hideAllPopups()"
+        >
+          <LazyCorporationsWSLogsAddMatchFormStep1
+            v-if="addMatchFormStep === 1"
+            @match-type="setMatchType"
+          />
+          <LazyCorporationsWSLogsAddMatchFormStep2
+            v-if="addMatchFormStep === 2"
+          />
+        </UiPopup>
+      </Teleport>
+    </ClientOnly>
 </template>
