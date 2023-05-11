@@ -32,11 +32,6 @@
     popupToggleVisibility();
   }
 
-  function setMatchType(matchType:number):void {
-    console.log(matchType)
-
-    addMatchFormStep.value = 2
-  }
 </script>
 
 <template>
@@ -69,11 +64,10 @@
         <UiPopup
           @close-popup="hideAllPopups()"
         >
-          <LazyCorporationsWSLogsAddMatchFormStep1
+          <LazyCorporationsWSLogsAddMatchType
             v-if="addMatchFormStep === 1"
-            @match-type="setMatchType"
           />
-          <LazyCorporationsWSLogsAddMatchFormStep2
+          <LazyCorporationsWSLogsAddMatchType
             v-if="addMatchFormStep === 2"
           />
         </UiPopup>
