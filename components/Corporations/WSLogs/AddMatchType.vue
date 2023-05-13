@@ -12,7 +12,7 @@
     if (sendRequest.value) return;
 
     const { data, pending, error} = await useFetch(
-      `${config.apiBaseUrl}/corporations/${currentCorporationId.value}/add-ws-match`,
+      `${config.apiBaseUrl}/corporations/${currentCorporationId.value}/add-ws-match/`,
       {
         method: 'POST',
         body: {
