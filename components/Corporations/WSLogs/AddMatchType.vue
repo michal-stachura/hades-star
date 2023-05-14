@@ -16,7 +16,8 @@
       {
         method: 'POST',
         body: {
-          matchType
+          matchType,
+          corporation: currentCorporationId.value,
         },
         headers: [
           ['Corporation-Secret', currentCorporationId.value]
@@ -43,19 +44,19 @@
       :text="'5 vs 5'"
       :layout="'transparent'"
       class="mx-2"
-      @click="setNewMatch('5 vs 5')"
+      @click="setNewMatch('5vs5')"
     />
     <UiButton 
       :text="'10 vs 10'"
       :layout="'transparent'"
       class="mx-2"
-      @click="setNewMatch('10 vs 10')"
+      @click="setNewMatch('10vs10')"
     />
     <UiButton 
       :text="'15 vs 15'"
       :layout="'transparent'"
       class="mx-2"
-      @click="setNewMatch('15 vs 15')"
+      @click="setNewMatch('15vs15')"
     />
   </div>
 </template>
