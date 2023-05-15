@@ -1,30 +1,17 @@
 <script setup lang="ts">
-  // @ts-ignore
-  import useCorporationDetails  from '@/composables/useCorporationDetails';
+  
 
-  type matchFormReactiveForm = {
-    matchType: number,
-  }
 
-  const { corporation, currentCorporationId, fetchCorporationData } = useCorporationDetails();
+  const { wsLogs, fetchWsLogs } = useWsLogs();
   const { isPopupVisible, popupToggleVisibility } = usePopup();
 
   const newMatchPopupVisible = ref<boolean>(false)
-  const addMatchFormStep = ref<number>(1)
-  const wsMatchForm = reactive<matchFormReactiveForm>(
-    {
-      matchType: 5
-    }
-  )
 
-
-  fetchCorporationData(currentCorporationId.value);
+  fetchWsLogs();
 
   function toggleAddMatchForm():void {
-    addMatchFormStep.value = 1; 
     newMatchPopupVisible.value = !newMatchPopupVisible.value;
     popupToggleVisibility();
-
   }
 
   function hideAllPopups(): void {
@@ -35,14 +22,14 @@
 </script>
 
 <template>
-  <div v-if="corporation">
+  <div>
     <div class="flex">
       <div class="grow">
         <UiHeaderH1
-          :nav-back="`/corporations/${currentCorporationId}`"
+          :nav-back="`/`"
           class="mb-4"
-          >
-          {{ corporation.name }} White Star Logs
+        >
+          White Star Logs
         </UiHeaderH1>
       </div>
       <div class="grow-0">
@@ -64,12 +51,7 @@
         <UiPopup
           @close-popup="hideAllPopups()"
         >
-          <LazyCorporationsWSLogsAddMatchType
-            v-if="addMatchFormStep === 1"
-          />
-          <LazyCorporationsWSLogsAddMatchType
-            v-if="addMatchFormStep === 2"
-          />
+          <LazyCorporationsWSLogsAddMatchType />
         </UiPopup>
       </Teleport>
     </ClientOnly>
