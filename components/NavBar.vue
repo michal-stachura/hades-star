@@ -12,6 +12,9 @@
       <NuxtLink to="/corporations/">
         Corporations
       </NuxtLink>
+      <NuxtLink to="/ws-logs/">
+        WS Logs
+      </NuxtLink>
     </div>
   </div>
 </template>

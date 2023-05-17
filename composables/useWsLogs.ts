@@ -5,18 +5,23 @@ const useWsLogs = () => {
   const wsLogs = useState<WsLog[]>('wsLogs', () => [])
   
   const fetchWsLogs = async () => {
+    console.log("fetch data")
     const config = useRuntimeConfig();
 
-    const { data, error, pending} = await useFetch(
-      `${config.apiBaseUrl}/ws-logs/`
-    )
-
-    if (data.value) {
-      wsLogs.value = data.value as WsLog[];
-    }
-    if (error.value) {
-      useToast().error(`${error.value.status} - ${error.value.statusText}`)
-    }
+    await fetch(
+      `${config.apiBaseUrl}/ws-logs/`,
+    ).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      return Promise.reject(response);
+    }).then((responseJson) => {
+      wsLogs.value = responseJson as WsLog[];
+    }).catch((error) => {
+      if (process.client) {
+        useToast().error(`${error.status} - ${error.statusText}`)
+      }
+    })
   }
 
   return {
