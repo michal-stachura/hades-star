@@ -5,7 +5,6 @@ const useWsLogs = () => {
   const wsLogs = useState<WsLog[]>('wsLogs', () => [])
   
   const fetchWsLogs = async () => {
-    console.log("fetch data")
     const config = useRuntimeConfig();
 
     await fetch(
